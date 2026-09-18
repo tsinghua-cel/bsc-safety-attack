@@ -1,0 +1,255 @@
+==> registering 21 validators in StakeHub via 18.143.159.138 http://127.0.0.1:8545 (wait 45s)
+Warning: Permanently added '18.143.159.138' (ED25519) to the list of known hosts.
+waiting 45s before registering...
+[createValidator] consensusAddr=0xbCDD0d2cDA5f6423E57B6a4dCD75DEcbE31aeCf0
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x32C34051a75CBC1e25B968Cc72142C91a56B521a
+msgHash: 0xca6a55e8cdc3c863cd7c83945cd81ba263b75438f52acbee3e7426fa992512e1
+signatureBytes: 0xe89dae2c150b2d3fd0a27af4ed514cc55d87f4e7f15ee8dfb3b36cdda13572c1
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1346405
+send createValidator. Tx hash: 0x9201d487f31ef5acb7746a5c6fd8c15a88ed3745993940f455b1acd6a524880c
+[createValidator] consensusAddr=0xBbD1aCC20Bd8304309d31D8fd235210d0EFC049d
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x14D642a6Dc2C25c9a37ccc576766e5838d71F52A
+msgHash: 0x687d6c577ffaa0ace99a2fb459aef20e898906aa0e26fba1ac68bff43e2b0fe6
+signatureBytes: 0x9c70acd34d75b0e4a6bcd731debb3f05901840603a7a2ae3c49224584a8de95f
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297042
+send createValidator. Tx hash: 0xc42395c71aad4479b9edd94de7ca0e84276b982f6161dbafc297d12043c1a935
+[createValidator] consensusAddr=0x5e2A531A825d8B61BCc305a35a7433e9A8920f0f
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0xf2a3cD5c10d6DdB6a588500EF80f2F5b56B8a21B
+msgHash: 0x247326d424a1b6f94089e22ecbe667c24ef5fde3024791d0168d126dd90c4c80
+signatureBytes: 0x7e96b05568e41acb81877edcc2c26f6261293bd8f5230b4dc4848ba44c690f65
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297042
+send createValidator. Tx hash: 0xb88b2984c1bf909389561756f96995721bda9d70a9c7c4e043efd52904a15add
+[createValidator] consensusAddr=0x3aD55d1D552cC55dee90C0faf0335383B2e6C5cE
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0xD5992a17324Cc466A0ed1B1D91433F3299F5FbE4
+msgHash: 0xb1ee635cc3949b3e0e2d79e5be8ff4d7b9d60333e62d7ae263a53fd17d9831eb
+signatureBytes: 0x950de66ed50cd5b2745a2d8b6c62516f8f796b32d49ef3448b2cac91c1f40b6b
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297042
+send createValidator. Tx hash: 0x8456bcf764e3a771038d245dcd0410e96556c560ad5a47ae9cce9ac6736131b1
+[createValidator] consensusAddr=0xfE02c8ff2374583C47b1d62fdF3E1b72C20eBE29
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0xbcA8aF2ABf5F797EF746D1E12c031E3640c8B8fb
+msgHash: 0x1a9c5b43a895b059f79be11d9abef3b0dd71ca1eef80d836f6c63b6bdd4990b4
+signatureBytes: 0xbe826aa747d0634d7526902c79a2b887f5fb39521c535000cc59959b00c196ce
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297030
+send createValidator. Tx hash: 0x8e033b8281b3cf17993754dc9e026fe49a5d17f18763b5c243207e1d8b1776ea
+[createValidator] consensusAddr=0xf7698AFa5461438Ff438C2322d6D29a5F7aBdfFd
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x348b9e5D85dC782BE4BD2c7db442A1d6e82ccB58
+msgHash: 0x7446bc03d49d92bc3f1ec97daf89a5e2917ffaf172a091520dad908931f01487
+signatureBytes: 0x5b04f3ecfc80938aa422ac01b5d2da4fa80ff3fa2db28a71baade6e8bd7c5b07
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1274535
+send createValidator. Tx hash: 0xaaa914e2a37da110472efc037640bc7fcda0bbb892cb571b9f4fd6a32d935cc9
+[createValidator] consensusAddr=0x5FDA3Ff6ea581EA7A5a9C2CB310b13c2126b4e8B
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x4CdE15d25529165df0a5fA531bf3F02077ee8978
+msgHash: 0x7a83c2763f07ead5b1b2b2bf74786a506f15ef09df1f3eaffd53cc2580ba8397
+signatureBytes: 0x425c67605c8e0e030fb797f79920c8928675b161a5454651e3ae97c965c21fb7
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297054
+send createValidator. Tx hash: 0x9e2c58589ef6a9b59754665219146232801fbdfa485f4458873fffe1ed5b556f
+[createValidator] consensusAddr=0xd30D79639bC9c4Ed71031bce28216862b80F4b6B
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x0571fF1afe83D24805534a27e67aacadde6EEC79
+msgHash: 0xcf1b5e71ecb19036b514aea2a506952970cf7f9d8d0168bdd4ded1942f11e00e
+signatureBytes: 0xd34b11f1a5e4c2b0e11bf5dd8388224c7cfea4aa694dfc359333305615056064
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297054
+send createValidator. Tx hash: 0xf9857fd33c079e0bcccb155b2c029b81ebc5110a9b8ef902bf679293371f1ccb
+[createValidator] consensusAddr=0x51cb3d0f6b77ef8317b31f4AaEaa75E4cfF3CCa7
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x34f4D833A19F55D16925A2fF696142d9157b044e
+msgHash: 0x1af1fac1a1561d4b33c402dc1632dc7874d1209ec0f8eb0abacde62ade30d918
+signatureBytes: 0x39044a34f2e4593cd0ef093fd6fa164d0f8259f763013eeb2849504c97578f06
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297042
+send createValidator. Tx hash: 0xc6a91a1fb5a033630302f32cf945104587602cba0d969667ef0c899a9baf914d
+[createValidator] consensusAddr=0xabb28e397aE478366271806B4851d81A678e404B
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x885E10586230BA00E1643149Ae159c14b63da96b
+msgHash: 0xbadd6b8eafec143af35413b70fe2157b325ba76b8a8128c772695315b9c34414
+signatureBytes: 0xf8e4d34bc94c8ce0532770bfc9e39168a677650857a22fb198517436b3af53d4
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297030
+send createValidator. Tx hash: 0x9a99180399343565b4fb9004677c64b2c3fd4422f99b3787a129fed8cb350707
+[createValidator] consensusAddr=0x6C73f4f3295F83cE342e4A82e8a50D218442451b
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x7969D1AD8c8f42ee8474226d7F48c5D1594913b4
+msgHash: 0x6d4eb5f124697f9ffae128115b1d38680a887f7f064f016ee9f6c226488d4503
+signatureBytes: 0x36689362b244f5be83ee7ce50e138a54d270e8c17eeb44042f8f91ff04f90ef8
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297378
+send createValidator. Tx hash: 0x306eb58927af3db90b1b5dbd1cd5f369d92ffbb62eed69dd7ba0d1a447710781
+[createValidator] consensusAddr=0xc12cF70a667d541A33bd51C623f8a7024ED8C2fE
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0xae955C240a2F0B8CB02d6d01525676932DF174e7
+msgHash: 0x8d526da3e69dddf5f6a10b6ddd3f60887e2a654bae35f1e68cca4367be032da8
+signatureBytes: 0xc9c067307fa6ef1e18b76e69ec71f2cf39465b8e149e37e03ac1d8d676127853
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297402
+send createValidator. Tx hash: 0xa899cb5245a567d1f042a9d9284908c171a05490a0bc910771e19cc60615708c
+[createValidator] consensusAddr=0xd2D3139575c2824d793d1664C2e1aaEEcAde11c0
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x031D1bb19018BC5022dd78E9EB187C0022bEb6eD
+msgHash: 0xd6eec8b4b02b0225f00a852add03f8071ca8ba5ba87d2fcf0fe5a3ea85bd0453
+signatureBytes: 0x88b5c102a9067ef2a85562e11c98f68b1616090a7da926740fa16ff0705a0f40
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297390
+send createValidator. Tx hash: 0x73f63d3203ec972af33df40d563a0492329632790651f24d3771340b6e337d35
+[createValidator] consensusAddr=0x20Be3a44B2Ae6Be29aCF84ED63aFe60b09179CdC
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0xE0035a79f29506cd7B1A8FeE04C2ca747CC47265
+msgHash: 0xe896d197a1496d71864d700c759a5ad2d3e9e54be6ef7b650a1ee5f6b45f8aad
+signatureBytes: 0xc6fd686325d4de89d4417e9e666df871413644e10a38d97842cc05f01ce00cf8
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1274883
+send createValidator. Tx hash: 0x7a8c9e9db71468e7c275341b559fbc897c5380dc080af58bde719ecd5adab6f6
+[createValidator] consensusAddr=0x50B947C8643C7694037b29545fbc423951e28442
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x2c1429f4026107A3db8147Acf6a5DAe424114e4a
+msgHash: 0x3316f2ba09248924f4a66d819a53181fae2a41ec351112d238410cc8cee430bc
+signatureBytes: 0xf537774423d63095196c3307f3f2a70e9af4e83fc15a2080f842d8b6f91b1e53
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1274883
+send createValidator. Tx hash: 0xb78ff12758c233f44389bf9893d17c463209b7219682974f600e1e9607a87f26
+[createValidator] consensusAddr=0xA8938f397823AfCaa252bb7dF137d39396456983
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x861d4D1ed57518B997880dFEC70232459792fb34
+msgHash: 0x248925b700ddc5ffc0dcbd0bbb6830e7c3f31b451aada1c848a005774c352230
+signatureBytes: 0x80d085800cc28a3fe3702c322e0c8e299d14340e09eafa860a8ffeba2ac64173
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297390
+send createValidator. Tx hash: 0x9c610745453b1ef449cbfdee60a5117482621bc0d78c7cc6acfc3ef3faeef822
+[createValidator] consensusAddr=0x5A7ae634876Fb264f97EaCC24a9261005e9bc39a
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x7a08c28Bf74E1C845B1d3940F9120aEeAB133001
+msgHash: 0x01268bc0fd84b635bd83a8a5b08d9ab4f4c3ebf2f569bc1c59e9478cd5145ba6
+signatureBytes: 0xe1b220db0408dd5d8d15c8689bc2f27384bf6278b7c1367e92e0e2162008b6ec
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297390
+send createValidator. Tx hash: 0x0870bf3e28f39746db6c0389213d8d40e7b162dc0f7c667bd13e37313c43c66f
+[createValidator] consensusAddr=0x511Aa4D222618F8698fEaaB811023Ca4E8Bebfe5
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x7e8Fbb6c445F46732b4C745724B5d63A2D1ffe0e
+msgHash: 0xae9631c0078e13c62878608e1daceb08a5debb850b009d03a02ef76eb35045a2
+signatureBytes: 0x7448c29712a26024e6924b6ec99f9df48aad83954d7ca85cd681607c6740f251
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297402
+send createValidator. Tx hash: 0xeae0a95a69428c56a2501407480b68ee0f797037d4cfb484881679621ca6a690
+[createValidator] consensusAddr=0xe9693A85E563485dA999B7D378d60483E89CAa0e
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x7D79B0C2CeFcB496a8C78DAC650dc2Bc2212D34A
+msgHash: 0x2d645ca0dde952d61085684f37c0244ac2869b9cdaa1e0235c7f4d13f720a217
+signatureBytes: 0xcc688ec6265810a6d6664970bf5256b78aecf9a4651fcd27e6875531dd4410f8
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297402
+send createValidator. Tx hash: 0x1b0500233990c8abc4496cf174de398fdb7d02d161e56e33efe9b64d57e9a7ec
+[createValidator] consensusAddr=0x9B50A300Da0cD7E036EC2cC12418756Ec07004BD
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x6070Ef09E78f7b28fd031071Fa793A54d1c3d342
+msgHash: 0x6a4957443bde39df8e385473721e3c4040691ba71a365dda7c3f7221bc5fbb06
+signatureBytes: 0x1ae6119a6a2aa2efea1876729304bb117cf6f22bcd1037e62e33e2dac357ab6e
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297378
+send createValidator. Tx hash: 0x98978206807951b06a05e783c3dae0be7bfd34270cef2610847574fc59e9ddb3
+[createValidator] consensusAddr=0x297E5eBBa75BBb67de013eB3D319Dd0A2a9861E9
+[createValidator] chainId=714
+[createValidator] len(pubKey)=48 (contract needs 48)
+[createValidator] len(blsProof)=96 (contract needs 96)
+--------------------------------
+pubKey1: 0x65184B0626c9d114941bBd9da2E35c3690E8d1f4
+msgHash: 0x56f7bc1b28b6d8fb5d8061c1ec654ebe642f1ab2738066f1fb6f6fb6acd8a85e
+signatureBytes: 0xabc373b5c2d5e3a6504446d88de44bc72bcea7ad0d7dcb7444e605ab095490cd
+blsSignatureVerify valid signature
+--------------------------------
+gas: 1297402
+send createValidator. Tx hash: 0xa513d7904fe534522326203df82e57d7c34449a2e0303f2db574b2cc21f45347

@@ -1,0 +1,14 @@
+==> [ATTACK][SG] per-slot vote across all attack slots @ 18.143.159.138
+height      b1    b2  winner
+300          7     0  b1    
+468          1     6  b2    
+636          7     0  b1    
+804          1     6  b2    
+972          7     0  b1    
+1140         1     6  b2    
+1308         7     0  b1    
+1476         7     0  b1    
+1644         7     0  b1    
+1812         7     0  b1    
+
+=== SUMMARY over 10 attack slots: b1 won 7, b2 won 3, tie 0 ===

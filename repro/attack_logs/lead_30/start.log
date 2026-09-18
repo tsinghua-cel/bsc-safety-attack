@@ -1,0 +1,131 @@
+Warning: Permanently added '3.10.211.250' (ED25519) to the list of known hosts.
+Warning: Permanently added '3.10.211.250' (ED25519) to the list of known hosts.
+==> ATTACK armed: slot=300 lead=30ms  b1(node14)=0x50b947c8643c7694037b29545fbc423951e28442 -> SG  b2(node17)=0x511aa4d222618f8698feaab811023ca4e8bebfe5 -> US
+==> launching start on 18.143.159.138 (log: /tmp/cluster_start_18_143_159_138.log)
+==> launching start on 3.90.13.14 (log: /tmp/cluster_start_3_90_13_14.log)
+==> launching start on 3.10.211.250 (log: /tmp/cluster_start_3_10_211_250.log)
+================ start output ================
+
+===== start 18.143.159.138 (node 0-6) =====
+attack env: ATTACK_SLOT=300 ATTACK_PERIOD=168 ATTACK_COUNT=10 ATTACK_REGION=sg ATTACK_B1=0x50b947c8643c7694037b29545fbc423951e28442 ATTACK_B2=0x511aa4d222618f8698feaab811023ca4e8bebfe5 ATTACK_SG_IPS=18.143.159.138 ATTACK_US_IPS=3.90.13.14 ATTACK_UK_IPS=3.10.211.250 ATTACK_INTURN_SILENCE=true
+Warning: Permanently added '18.143.159.138' (ED25519) to the list of known hosts.
+Warning: Permanently added '18.143.159.138' (ED25519) to the list of known hosts.
+Warning: Permanently added '18.143.159.138' (ED25519) to the list of known hosts.
+  [18.143.159.138] syncing bsc_cluster_multi.sh
+Warning: Permanently added '18.143.159.138' (ED25519) to the list of known hosts.
+Warning: Permanently added '18.143.159.138' (ED25519) to the list of known hosts.
+[git pull]
+Already up to date.
+[unpack code]
+[make geth]
+go run build/ci.go install ./cmd/geth
+>>> /home/ubuntu/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.0.linux-amd64/bin/go build -ldflags "--buildid=none -extldflags '-Wl,-z,stack-size=0x800000,--build-id=none,--strip-all'" -tags urfave_cli_no_docs,ckzg -trimpath -v -o /home/ubuntu/bsc-new-attack-experiment/code/attack-3-code/build/bin/geth ./cmd/geth
+# github.com/ethereum/go-ethereum/cmd/geth
+/usr/bin/ld: warning: static_code.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+Done building.
+Run "./build/bin/geth" to launch geth.
+[install bin]
+Geth
+Version: 1.6.6
+Git Commit: d444bab2687cd53b64b4b5d9c46ad82c1f8efe7a
+[start nodes]
+ATTACK env: slot=300 region=sg b1=0x50b947c8643c7694037b29545fbc423951e28442 b2=0x511aa4d222618f8698feaab811023ca4e8bebfe5 lead= sg=18.143.159.138 us=3.90.13.14 uk=3.10.211.250 inturnSilence=true
+node0: chaindata missing, running geth init (path/pebble)
+node1: chaindata missing, running geth init (path/pebble)
+node2: chaindata missing, running geth init (path/pebble)
+node3: chaindata missing, running geth init (path/pebble)
+node4: chaindata missing, running geth init (path/pebble)
+node5: chaindata missing, running geth init (path/pebble)
+node6: chaindata missing, running geth init (path/pebble)
+started node0 (extip=18.143.159.138, p2p=30311, http=8545)
+started node1 (extip=18.143.159.138, p2p=30312, http=8547)
+started node2 (extip=18.143.159.138, p2p=30313, http=8549)
+started node3 (extip=18.143.159.138, p2p=30314, http=8551)
+started node4 (extip=18.143.159.138, p2p=30315, http=8553)
+started node5 (extip=18.143.159.138, p2p=30316, http=8555)
+started node6 (extip=18.143.159.138, p2p=30317, http=8557)
+===== 18.143.159.138 start done (exit 0) =====
+
+===== start 3.90.13.14 (node 7-13) =====
+attack env: ATTACK_SLOT=300 ATTACK_PERIOD=168 ATTACK_COUNT=10 ATTACK_REGION=us ATTACK_B1=0x50b947c8643c7694037b29545fbc423951e28442 ATTACK_B2=0x511aa4d222618f8698feaab811023ca4e8bebfe5 ATTACK_SG_IPS=18.143.159.138 ATTACK_US_IPS=3.90.13.14 ATTACK_UK_IPS=3.10.211.250 ATTACK_INTURN_SILENCE=true
+Warning: Permanently added '3.90.13.14' (ED25519) to the list of known hosts.
+Warning: Permanently added '3.90.13.14' (ED25519) to the list of known hosts.
+Warning: Permanently added '3.90.13.14' (ED25519) to the list of known hosts.
+  [3.90.13.14] syncing bsc_cluster_multi.sh
+Warning: Permanently added '3.90.13.14' (ED25519) to the list of known hosts.
+Warning: Permanently added '3.90.13.14' (ED25519) to the list of known hosts.
+[git pull]
+Already up to date.
+[unpack code]
+[make geth]
+go run build/ci.go install ./cmd/geth
+>>> /home/ubuntu/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.0.linux-amd64/bin/go build -ldflags "--buildid=none -extldflags '-Wl,-z,stack-size=0x800000,--build-id=none,--strip-all'" -tags urfave_cli_no_docs,ckzg -trimpath -v -o /home/ubuntu/bsc-new-attack-experiment/code/attack-3-code/build/bin/geth ./cmd/geth
+# github.com/ethereum/go-ethereum/cmd/geth
+/usr/bin/ld: warning: static_code.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+Done building.
+Run "./build/bin/geth" to launch geth.
+[install bin]
+Geth
+Version: 1.6.6
+Git Commit: d444bab2687cd53b64b4b5d9c46ad82c1f8efe7a
+[start nodes]
+ATTACK env: slot=300 region=us b1=0x50b947c8643c7694037b29545fbc423951e28442 b2=0x511aa4d222618f8698feaab811023ca4e8bebfe5 lead= sg=18.143.159.138 us=3.90.13.14 uk=3.10.211.250 inturnSilence=true
+node7: chaindata missing, running geth init (path/pebble)
+node8: chaindata missing, running geth init (path/pebble)
+node9: chaindata missing, running geth init (path/pebble)
+node10: chaindata missing, running geth init (path/pebble)
+node11: chaindata missing, running geth init (path/pebble)
+node12: chaindata missing, running geth init (path/pebble)
+node13: chaindata missing, running geth init (path/pebble)
+started node7 (extip=3.90.13.14, p2p=30318, http=8559)
+started node8 (extip=3.90.13.14, p2p=30319, http=8561)
+started node9 (extip=3.90.13.14, p2p=30320, http=8563)
+started node10 (extip=3.90.13.14, p2p=30321, http=8565)
+started node11 (extip=3.90.13.14, p2p=30322, http=8567)
+started node12 (extip=3.90.13.14, p2p=30323, http=8569)
+started node13 (extip=3.90.13.14, p2p=30324, http=8571)
+===== 3.90.13.14 start done (exit 0) =====
+
+===== start 3.10.211.250 (node 14-20) =====
+attack env: ATTACK_SLOT=300 ATTACK_PERIOD=168 ATTACK_COUNT=10 ATTACK_REGION=uk ATTACK_B1=0x50b947c8643c7694037b29545fbc423951e28442 ATTACK_B2=0x511aa4d222618f8698feaab811023ca4e8bebfe5 ATTACK_SG_IPS=18.143.159.138 ATTACK_US_IPS=3.90.13.14 ATTACK_UK_IPS=3.10.211.250 ATTACK_INTURN_SILENCE=true LEAD_TIME_MS=30
+Warning: Permanently added '3.10.211.250' (ED25519) to the list of known hosts.
+Warning: Permanently added '3.10.211.250' (ED25519) to the list of known hosts.
+Warning: Permanently added '3.10.211.250' (ED25519) to the list of known hosts.
+  [3.10.211.250] syncing bsc_cluster_multi.sh
+Warning: Permanently added '3.10.211.250' (ED25519) to the list of known hosts.
+Warning: Permanently added '3.10.211.250' (ED25519) to the list of known hosts.
+[git pull]
+Already up to date.
+[unpack code]
+[make geth]
+go run build/ci.go install ./cmd/geth
+>>> /home/ubuntu/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.0.linux-amd64/bin/go build -ldflags "--buildid=none -extldflags '-Wl,-z,stack-size=0x800000,--build-id=none,--strip-all'" -tags urfave_cli_no_docs,ckzg -trimpath -v -o /home/ubuntu/bsc-new-attack-experiment/code/attack-3-code/build/bin/geth ./cmd/geth
+# github.com/ethereum/go-ethereum/cmd/geth
+/usr/bin/ld: warning: static_code.o: missing .note.GNU-stack section implies executable stack
+/usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+Done building.
+Run "./build/bin/geth" to launch geth.
+[install bin]
+Geth
+Version: 1.6.6
+Git Commit: d444bab2687cd53b64b4b5d9c46ad82c1f8efe7a
+[start nodes]
+ATTACK env: slot=300 region=uk b1=0x50b947c8643c7694037b29545fbc423951e28442 b2=0x511aa4d222618f8698feaab811023ca4e8bebfe5 lead=30 sg=18.143.159.138 us=3.90.13.14 uk=3.10.211.250 inturnSilence=true
+node14: chaindata missing, running geth init (path/pebble)
+node15: chaindata missing, running geth init (path/pebble)
+node16: chaindata missing, running geth init (path/pebble)
+node17: chaindata missing, running geth init (path/pebble)
+node18: chaindata missing, running geth init (path/pebble)
+node19: chaindata missing, running geth init (path/pebble)
+node20: chaindata missing, running geth init (path/pebble)
+started node14 (extip=3.10.211.250, p2p=30325, http=8573)
+started node15 (extip=3.10.211.250, p2p=30326, http=8575)
+started node16 (extip=3.10.211.250, p2p=30327, http=8577)
+started node17 (extip=3.10.211.250, p2p=30328, http=8579)
+started node18 (extip=3.10.211.250, p2p=30329, http=8581)
+started node19 (extip=3.10.211.250, p2p=30330, http=8583)
+started node20 (extip=3.10.211.250, p2p=30331, http=8585)
+===== 3.10.211.250 start done (exit 0) =====
+all hosts started.

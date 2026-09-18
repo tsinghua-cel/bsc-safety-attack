@@ -1,0 +1,17 @@
+# Runtime node data (huge; recreated on each run)
+**/.local
+**/.local.b
+**/.local.bb
+node-deploy/.venv
+node-deploy/bin
+**/build/bin
+**/__pycache__
+
+# Collected results and archives (not needed to run experiments)
+testdata
+*.zip
+node-deploy.zip
+
+# Root repo history is not needed inside the image; the per-experiment
+# code/*/.git repos ARE kept so the flow scripts can checkout branches.
+/.git

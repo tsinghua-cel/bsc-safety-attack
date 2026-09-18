@@ -1,0 +1,73 @@
+============================================================
+ BSC backup-block propagation attack — lead_time sweep
+ Singapore per-slot vote (b1 -> SG direct, b2 -> via US)
+ 10 attack slots per lead, period 168
+============================================================
+
+########## lead_time = 30 ms ##########
+height      b1    b2  winner
+300          7     0  b1    
+468          7     0  b1    
+636          7     0  b1    
+804          7     0  b1    
+972          5     0  b1    
+1140         7     0  b1    
+1308         7     0  b1    
+1476         7     0  b1    
+1644         6     0  b1    
+1812         6     0  b1    
+
+=== SUMMARY over 10 attack slots: b1 won 10, b2 won 0, tie 0 ===
+
+########## lead_time = 60 ms ##########
+height      b1    b2  winner
+300          6     0  b1    
+468          7     0  b1    
+636          7     0  b1    
+804          7     0  b1    
+972          7     0  b1    
+1140         7     0  b1    
+1308         7     0  b1    
+1476         7     0  b1    
+1644         6     0  b1    
+1812         7     0  b1    
+
+=== SUMMARY over 10 attack slots: b1 won 10, b2 won 0, tie 0 ===
+
+########## lead_time = 75 ms ##########
+height      b1    b2  winner
+300          5     0  b1    
+468          2     5  b2    
+636          7     0  b1    
+804          0     7  b2    
+972          7     0  b1    
+1140         4     3  b1    
+1308         7     0  b1    
+1476         7     0  b1    
+1644         6     0  b1    
+1812         7     0  b1    
+
+=== SUMMARY over 10 attack slots: b1 won 8, b2 won 2, tie 0 ===
+
+########## lead_time = 90 ms ##########
+height      b1    b2  winner
+300          7     0  b1    
+468          1     6  b2    
+636          7     0  b1    
+804          1     6  b2    
+972          7     0  b1    
+1140         1     6  b2    
+1308         7     0  b1    
+1476         7     0  b1    
+1644         7     0  b1    
+1812         7     0  b1    
+
+=== SUMMARY over 10 attack slots: b1 won 7, b2 won 3, tie 0 ===
+
+============================================================
+ OVERALL (b2 = Singapore flips to the US-routed sibling)
+   lead=30ms  b1 10 / b2 0
+   lead=60ms  b1 10 / b2 0
+   lead=75ms  b1 8 / b2 2
+   lead=90ms  b1 7 / b2 3
+============================================================
