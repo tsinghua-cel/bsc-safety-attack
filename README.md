@@ -122,28 +122,15 @@ flow script `git checkout NAME` in the corresponding code repo before building; 
 
 ## Docker
 
-> Docker images are the recommended way to run each experiment in a clean, isolated environment.
-> The `docker/` directory holds a shared base image plus one image per experiment; build them
-> once, then run any experiment from its image.
+You can either use the prebuilt Docker Hub images or build equivalent images from the local
+repository. For the quickest run, use the prebuilt images below. Run one experiment at a time
+and wait for the command to finish. The command streams the
+experiment log in the terminal; success means the flow prints its final `... experiment flow finished`
+message and returns exit code `0`.
 
-The images under `docker/`:
-
-| Dockerfile | Image tag | Runs |
-| --- | --- | --- |
-| `docker/base.Dockerfile` | `bsc-attack-base:latest` | shared build env (Go 1.24, Node 18.20.2/npm 6.14.6, Foundry v1.2.1, python3.12, poetry, jq) + repo source |
-| `docker/attack-1.Dockerfile` | `bsc-attack-1` | `test_attack_1_flow.sh` |
-| `docker/attack-2.Dockerfile` | `bsc-attack-2` | `test_attack_2_flow.sh` |
-| `docker/attack-2-turnlen-8.Dockerfile` | `bsc-attack-2-turnlen-8` | `test_attack_2_8_flow.sh` |
-| `docker/repair.Dockerfile` | `bsc-repair` | `repair.sh` |
-| `docker/repair-8.Dockerfile` | `bsc-repair-8` | `repair_8.sh` |
-
-### Pull prebuilt images from Docker Hub
-
-Prebuilt images are published under the `erick785` namespace, so you can run any experiment
-without building anything locally.
+### 1. Pull the images (once)
 
 ```bash
-# pull every experiment image
 docker pull erick785/bsc-new-attack-1
 docker pull erick785/bsc-new-attack-2
 docker pull erick785/bsc-new-attack-2-turnlen-8
@@ -151,96 +138,85 @@ docker pull erick785/bsc-new-repair
 docker pull erick785/bsc-new-repair-8
 ```
 
+### Build images from the local repository (optional)
 
-| Experiment | Docker Hub image | Local build tag |
-| --- | --- | --- |
-| Attack 1 | `erick785/bsc-new-attack-1` | `bsc-attack-1` |
-| Attack 2 | `erick785/bsc-new-attack-2` | `bsc-attack-2` |
-| Attack 2 (turn length 8) | `erick785/bsc-new-attack-2-turnlen-8` | `bsc-attack-2-turnlen-8` |
-| Repair | `erick785/bsc-new-repair` | `bsc-repair` |
-| Repair (turn length 8) | `erick785/bsc-new-repair-8` | `bsc-repair-8` |
-
-The image entrypoint is the flow script, so flags can be appended after the image name (same as
-the local-build commands in [Run an experiment](#run-an-experiment)):
+If you need to use local source changes or do not want to pull prebuilt images, build from the
+current repository. This does not change the run commands; it only creates local image tags.
 
 ```bash
-# attack 1  (./test_attack_1_flow.sh ...)
-docker run --rm erick785/bsc-new-attack-1
-docker run --rm erick785/bsc-new-attack-1 --turnlength8
-docker run --rm erick785/bsc-new-attack-1 --epoch-interval epoch_200_interval_3000
-docker run --rm erick785/bsc-new-attack-1 --epoch-interval epoch_1000_interval_450 --turnlength8
-
-# attack 2  (./test_attack_2_flow.sh ...)
-docker run --rm erick785/bsc-new-attack-2
-docker run --rm erick785/bsc-new-attack-2 --epoch-interval epoch_200_interval_3000
-
-# attack 2, turn length 8  (./test_attack_2_8_flow.sh ...)
-docker run --rm erick785/bsc-new-attack-2-turnlen-8
-docker run --rm erick785/bsc-new-attack-2-turnlen-8 --epoch-interval epoch_1000_interval_450
-
-# repair  (./repair.sh ...)
-docker run --rm erick785/bsc-new-repair
-docker run --rm erick785/bsc-new-repair --epoch-interval epoch_200_interval_3000
-
-# repair, turn length 8  (./repair_8.sh ...)
-docker run --rm erick785/bsc-new-repair-8
-docker run --rm erick785/bsc-new-repair-8 --epoch-interval epoch_1000_interval_450
-```
-
-### Build images
-
-```bash
-# build the shared base, then all per-experiment images
+# Build the base image and all experiment images
 ./docker/build.sh
-# or build a single experiment (still builds the base first)
+
+# Or build one experiment (the base image is built first)
 ./docker/build.sh attack-1
+./docker/build.sh attack-2
+./docker/build.sh attack-2-turnlen-8
+./docker/build.sh repair
+./docker/build.sh repair-8
 ```
 
-The base image is built from the repo root so it can copy `code/*` (with their `.git`) and
-`node-deploy/`; large runtime/data directories are excluded by `.dockerignore`. The
-per-experiment images only set an entrypoint, so they build from the small `docker/` context.
+The local image tags are `bsc-attack-1`, `bsc-attack-2`, `bsc-attack-2-turnlen-8`,
+`bsc-repair`, and `bsc-repair-8`. Replace the Docker Hub image name in the run commands with
+the corresponding local tag.
 
-### Run an experiment
+### 2. Run an experiment
 
-The image entrypoint is the flow script, so any flag accepted by the script can be appended after
-the image name. Each command below is the Docker equivalent of the matching `./<script>` call.
+Use the command for the experiment you want to verify:
 
 ```bash
-# attack 1  (./test_attack_1_flow.sh ...)
-docker run --rm bsc-attack-1
-docker run --rm bsc-attack-1 --turnlength8
-docker run --rm bsc-attack-1 --epoch-interval epoch_200_interval_3000
-docker run --rm bsc-attack-1 --epoch-interval epoch_1000_interval_450 --turnlength8
+# Attack 1
+docker run --rm erick785/bsc-new-attack-1
 
-# attack 2  (./test_attack_2_flow.sh ...)
-docker run --rm bsc-attack-2
-docker run --rm bsc-attack-2 --epoch-interval epoch_200_interval_3000
+# Attack 2
+docker run --rm erick785/bsc-new-attack-2
 
-# attack 2, turn length 8  (./test_attack_2_8_flow.sh ...)
-docker run --rm bsc-attack-2-turnlen-8
-docker run --rm bsc-attack-2-turnlen-8 --epoch-interval epoch_1000_interval_450
+# Attack 2 with turn length 8
+docker run --rm erick785/bsc-new-attack-2-turnlen-8
 
-# repair  (./repair.sh ...)
-docker run --rm bsc-repair
-docker run --rm bsc-repair --epoch-interval epoch_200_interval_3000
+# Repair
+docker run --rm erick785/bsc-new-repair
 
-# repair, turn length 8  (./repair_8.sh ...)
-docker run --rm bsc-repair-8
-docker run --rm bsc-repair-8 --epoch-interval epoch_1000_interval_450
+# Repair with turn length 8
+docker run --rm erick785/bsc-new-repair-8
 ```
 
-The same options can also be passed as environment variables that the flow scripts understand:
-
-- `EPOCH_INTERVAL=NAME` — same as `--epoch-interval NAME` (must be a valid branch for that experiment).
-- `TURNLENGTH8=1` — same as `--turnlength8` (attack 1 only).
+Do not press `Ctrl-C` while a run is active. These experiments start a local 21-validator
+network and may take several minutes. When the command returns, check the exit status
+immediately if needed:
 
 ```bash
-docker run --rm -e TURNLENGTH8=1 -e EPOCH_INTERVAL=epoch_1000_interval_450 bsc-attack-1
+echo $?    # 0 means the experiment flow succeeded
 ```
 
-Each run starts a 21+ node cluster, so give Docker enough CPU/RAM. Node logs and data are written
-to `node-deploy/.local` inside the container; mount a volume there to keep the results after the
-container exits, e.g. `docker run --rm -v "$PWD/out:/opt/bsc-attack/node-deploy/.local" bsc-attack-1`.
+The `--rm` option removes the finished container after the run. The commands above are for
+verifying the experiment result; the flow scripts perform the build, initialization, cluster
+startup, checks, and cleanup inside the container.
+
+### Optional parameter configurations
+
+The README's parameter-adjustment configurations can be run by appending the corresponding
+option:
+
+```bash
+# Attack 1: epoch 1000 / 450 ms / turn length 8
+docker run --rm erick785/bsc-new-attack-1 \
+  --epoch-interval epoch_1000_interval_450 --turnlength8
+
+# Attack 2: epoch 200 / 3000 ms
+docker run --rm erick785/bsc-new-attack-2 \
+  --epoch-interval epoch_200_interval_3000
+
+# Attack 2, turn length 8: epoch 1000 / 450 ms
+docker run --rm erick785/bsc-new-attack-2-turnlen-8 \
+  --epoch-interval epoch_1000_interval_450
+
+# Repair, turn length 8: epoch 1000 / 450 ms
+docker run --rm erick785/bsc-new-repair-8 \
+  --epoch-interval epoch_1000_interval_450
+```
+
+For the separate multi-datacenter delivery experiment, use the workflow under [`repro/`](repro/);
+it requires three evaluator-controlled hosts and SSH credentials.
 
 ## Manual build & execution
 
