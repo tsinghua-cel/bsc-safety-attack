@@ -194,10 +194,12 @@ docker run --rm erick785/bsc-new-attack-2-turnlen-8
 ```
 
 Do not press `Ctrl-C` while a run is active. These experiments start a local 21-validator
-network and may take several minutes. When the command returns, check the exit status:
+network and may take several minutes. 
 
-```bash
-echo $?    # 0 means the experiment flow succeeded
+The success sign is a final log line containing:
+
+```text
+[YYYY-MM-DD HH:MM:SS] ... experiment flow finished
 ```
 
 The `--rm` option removes the finished container after the run. The flow scripts perform the
@@ -214,50 +216,6 @@ section below; the delivery experiment uses the separate multi-host workflow und
 
 We also provide a fully manual setup for users who prefer to inspect and customize the testing
 environment. See the [Appendix](#appendix) for the complete dependency list and setup steps.
-
-## Attack success criteria
-
-### Attack 1
-
-The attack succeeds when the finalized-height and attestation outputs show:
-
-- Before slot `999`, the benchmark chain and both attack branches have the same finalized height.
-- After slot `999`, both attack branches remain at finalized height `996` while the benchmark continues
-  to increase.
-- Before the CVS switch, `c1` has `11` matching attestations and `c2` has `4`, both below the
-  finalization threshold `14`.
-- After the CVS switch, the counts rise to `16` on `c1` and `17` on `c2`, and both branches resume
-  independent finalization.
-
-### Attack 2
-
-The attack succeeds when the finalized-height and accumulated-difficulty outputs show:
-
-- At slot `999`, the benchmark finalizes height `997` while both attack branches remain at height `996`.
-- From slot `999` to `1087`, the benchmark reaches height `1085` while both attack branches remain
-  at `996`.
-- At slot `999`, `c1` and `c2` have accumulated difficulties `1998` and `1996`; afterward, the two
-  branches increase their difficulties alternately and remain close.
-- After the CVS switch, both attack branches resume finalization, producing conflicting finalized blocks.
-
-### Repair
-
-The repair run uses the same flow, but after the fork window the partition is lifted. Success here
-is the **opposite** of the attacks: once propagation is restored, the two branches must
-**re-converge** onto a single canonical chain. Concretely, the A-chain and B-chain `Parlia
-finalized block number changed` lines should report the **same `sourceHash`** (and the same
-`prevFinalized` / `targetNumber`):
-
-```text
-A-chain finalized log:
-... msg="Parlia finalized block number changed" header=... prevFinalized=... newFinalized=... targetNumber=N sourceHash=0xSAME...
-B-chain finalized log:
-... msg="Parlia finalized block number changed" header=... prevFinalized=... newFinalized=... targetNumber=N sourceHash=0xSAME...
-```
-
-When both branches show the identical `sourceHash` for the same `targetNumber`, the fork has
-healed and the repair succeeded. The collected `repair_*` CSVs under `testdata/<config>/csv/`
-capture this convergence behavior.
 
 ## Manual local run
 
