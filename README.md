@@ -120,7 +120,11 @@ flow script `git checkout NAME` in the corresponding code repo before building; 
     (provision → genesis → experiment) and configured from `repro/config.sh`. Sweeps
     `LEAD_TIME_MS`. See [`repro/REPRODUCE.md`](repro/REPRODUCE.md) for the full guide.
 
-## Docker
+## Docker (recommended)
+
+**Docker is the recommended way to run Attack 1, Attack 2, parameter-adjustment, and repair
+experiments.** It provides the tested toolchain and an isolated 21-validator environment, so
+users do not need to install Go, Node.js, Foundry, Poetry, or Python dependencies manually.
 
 You can either use the prebuilt Docker Hub images or build equivalent images from the local
 repository. For the quickest run, use the prebuilt images below. Run one experiment at a time
