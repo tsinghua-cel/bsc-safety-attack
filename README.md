@@ -8,14 +8,18 @@ experiments, and the supplementary repair workflows use a local 21-validator BSC
 The delivery experiment uses a separate geo-distributed three-region testbed; its full AWS workflow
 is documented in [`repro/REPRODUCE.md`](repro/REPRODUCE.md).
 
-- **Attack 1 (warm-up attack / network split).** The 21-validator cluster is split into two logical partitions,
-  and validator `node11` is intentionally duplicated so an extra instance can join the second
-  partition. After height `400` each partition keeps advancing and finalizing blocks on its own,
-  proving the network forked into two independently finalizing chains.
-- **Attack 2 (committee divergence attack / directed propagation).** Starting around height `398`, blocks are no longer
-  broadcast freely. A manual routing schedule forwards each block only to the next validator on
-  its branch, which grows two parallel chains (A and B). After the manual window (~height `411`)
-  both branches keep sealing and finalize independently while propagation stays branch-local.
+- **Attack 1 (warm-up attack / network split).** Before slot `999`, the benchmark chain and the two
+  attack branches have the same finalized height. At slot `999`, Byzantine validators send different
+  delegation transactions to the two groups. The attack branches then remain at finalized height `996`
+  while the benchmark continues to advance. Matching attestations fall to `11` on `c1` and `4` on
+  `c2`, below the threshold of `14`; after the CVS switch they rise to `16` and `17`, and both
+  branches resume independent finalization.
+- **Attack 2 (committee divergence attack / directed propagation).** Before slot `999`, the benchmark
+  chain and the attack branches have the same finalized height. At slot `999`, the benchmark finalizes
+  height `997` while both attack branches remain at `996`. From slot `999` to `1087`, the benchmark
+  reaches height `1085` while both attack branches stay at `996`. After the CVS switch, both branches
+  resume finalization. At slot `999`, `c1` and `c2` have accumulated difficulties `1998` and `1996`;
+  the two values then increase alternately and remain close, so neither branch gains a decisive advantage.
 - **Parameter-adjustment experiments (paper Q3).** The committee divergence attack is rerun across
   the four epoch/block-interval/turnLength configurations in Table 2 of the paper. The archived
   outputs for this evaluation are the Attack 2 CSVs under the four `testdata/<config>/` directories.
@@ -50,15 +54,15 @@ variants where provided. With turn length `1` a validator seals one block per tu
 `repro/REPRODUCE.md`. Longer turns stretch the manual schedule window and therefore move the attack
 milestones to higher blocks. The block heights are defined per build in each `code/*/params/validators.go`:
 
-- Attack 2, turn length `1` (`attack-2-code`): experiment window starts at height `398`
-  (`NetworkSplitStartHeight`) and the manual routing window ends at `411` (`NetworkSplitManualEnd`),
-  so branches finalize independently after height ~`411`.
-- Attack 2, turn length `8` (`attack-2-turnlen-8-code`): the window still starts at `398`, but the
-  manual routing window runs through `487` (`NetworkSplitManualEnd = 487`) because each validator
-  holds 8 consecutive blocks, so independent finalization is observed only after height ~`488`.
+- Attack 2, turn length `1` (`attack-2-code`): the Q3 parameter-variation runs use an experiment
+  window starting at height `398` (`NetworkSplitStartHeight`) and a manual routing window ending at
+  `411` (`NetworkSplitManualEnd`).
+- Attack 2, turn length `8` (`attack-2-turnlen-8-code`): the reported Q2 run uses
+  `epoch_1000_interval_450`, with the experiment starting at height `998` (attack launched at slot
+  `999`) and the manual routing window ending at slot `1087` (`NetworkSplitManualEnd`).
 
-(Attack 1's split height is set the same way via `NetworkSplitStartHeight` and shifts with the
-epoch/interval branch, e.g. `400` on `master` vs `998` on `epoch_1000_interval_450`.)
+(Attack 1's split height is set the same way via `NetworkSplitStartHeight`; for the reported
+`epoch_1000_interval_450` run, the attack is launched at slot `999`.)
 
 ### Collected test data (`testdata/`)
 
@@ -165,62 +169,42 @@ the corresponding local tag.
 
 ### 2. Run an experiment
 
-Use the command for the experiment you want to verify:
+Run one experiment at a time and wait for the command to finish.
 
 ```bash
-# Attack 1
-docker run --rm erick785/bsc-new-attack-1
+# Q1: Violation of safety for the warm-up attack
+docker run --rm erick785/bsc-new-attack-1 \
+  --epoch-interval epoch_1000_interval_450 --turnlength8
 
-# Attack 2
+# Q2: Violation of safety for the committee divergence attack
+docker run --rm erick785/bsc-new-attack-2-turnlen-8 \
+  --epoch-interval epoch_1000_interval_450
+
+# Q3: Impact of protocol parameters
+
+# Parameter variation: S=200, 3s, turnLength=1
+docker run --rm erick785/bsc-new-attack-2 \
+  --epoch-interval epoch_200_interval_3000
+
+# Parameter variation: S=200, 1s, turnLength=1
 docker run --rm erick785/bsc-new-attack-2
 
-# Attack 2 with turn length 8
+# Parameter variation: S=200, 1s, turnLength=8
 docker run --rm erick785/bsc-new-attack-2-turnlen-8
-
-# Repair
-docker run --rm erick785/bsc-new-repair
-
-# Repair with turn length 8
-docker run --rm erick785/bsc-new-repair-8
 ```
 
 Do not press `Ctrl-C` while a run is active. These experiments start a local 21-validator
-network and may take several minutes. When the command returns, check the exit status
-immediately if needed:
+network and may take several minutes. When the command returns, check the exit status:
 
 ```bash
 echo $?    # 0 means the experiment flow succeeded
 ```
 
-The `--rm` option removes the finished container after the run. The commands above are for
-verifying the experiment result; the flow scripts perform the build, initialization, cluster
-startup, checks, and cleanup inside the container.
+The `--rm` option removes the finished container after the run. The flow scripts perform the
+build, initialization, cluster startup, checks, and cleanup inside the container.
 
-### Optional parameter configurations
-
-The README's parameter-adjustment configurations can be run by appending the corresponding
-option:
-
-```bash
-# Attack 1: epoch 1000 / 450 ms / turn length 8
-docker run --rm erick785/bsc-new-attack-1 \
-  --epoch-interval epoch_1000_interval_450 --turnlength8
-
-# Attack 2: epoch 200 / 3000 ms
-docker run --rm erick785/bsc-new-attack-2 \
-  --epoch-interval epoch_200_interval_3000
-
-# Attack 2, turn length 8: epoch 1000 / 450 ms
-docker run --rm erick785/bsc-new-attack-2-turnlen-8 \
-  --epoch-interval epoch_1000_interval_450
-
-# Repair, turn length 8: epoch 1000 / 450 ms
-docker run --rm erick785/bsc-new-repair-8 \
-  --epoch-interval epoch_1000_interval_450
-```
-
-For the separate multi-datacenter delivery experiment, use the workflow under [`repro/`](repro/);
-it requires three evaluator-controlled hosts and SSH credentials.
+For the separate Delivery experiment (Q4: Feasibility of selective delivery), use the workflow
+under [`repro/`](repro/); it requires three evaluator-controlled hosts and SSH credentials.
 
 ## Manual build & execution
 
@@ -235,37 +219,26 @@ environment. See the [Appendix](#appendix) for the complete dependency list and 
 
 ### Attack 1
 
-The attack succeeds when both `node0` (partition A) and `node10` (partition B) print a `Parlia
-finalized block number changed` log after height `400`:
+The attack succeeds when the finalized-height and attestation outputs show:
 
-```text
-[2026-05-04 17:51:43] node0 matched log line:
-t=05-04|17:51:43.012 lvl=info msg="Parlia finalized block number changed" header=413 prevFinalized=396 newFinalized=411 targetNumber=412 sourceHash=0x429c73a6e9...
-[2026-05-04 17:52:43] node10 matched log line:
-t=05-04|17:52:43.035 lvl=info msg="Parlia finalized block number changed" header=413 prevFinalized=396 newFinalized=411 targetNumber=412 sourceHash=0x9b20451f...
-```
-
-How to read it: both lines share the **same `prevFinalized=396`** (the common pre-split finalized
-base), but they report **different `sourceHash`** for the same `targetNumber`. Two partitions
-finalizing different blocks on top of the same base is the safety violation, so a differing
-`sourceHash` (with identical `prevFinalized`) means the attack succeeded.
+- Before slot `999`, the benchmark chain and both attack branches have the same finalized height.
+- After slot `999`, both attack branches remain at finalized height `996` while the benchmark continues
+  to increase.
+- Before the CVS switch, `c1` has `11` matching attestations and `c2` has `4`, both below the
+  finalization threshold `14`.
+- After the CVS switch, the counts rise to `16` on `c1` and `17` on `c2`, and both branches resume
+  independent finalization.
 
 ### Attack 2
 
-The attack succeeds when both branches finalize independently after the manual split window. The
-automation watches branch-local candidate logs and requires one `Parlia finalized block number
-changed` line with `header >= 411` for each branch, then waits until both branches pass height
-`450` before stopping the cluster:
+The attack succeeds when the finalized-height and accumulated-difficulty outputs show:
 
-```text
-[2026-05-04 18:11:10] A-chain matched finalized log in .local/node1/bsc.log:
-t=05-04|18:11:10.004 lvl=info msg="Parlia finalized block number changed" header=413 prevFinalized=396 newFinalized=411 targetNumber=412 sourceHash=0x6c1d2f...
-[2026-05-04 18:11:52] B-chain matched finalized log in .local/node0/bsc.log:
-t=05-04|18:11:52.061 lvl=info msg="Parlia finalized block number changed" header=413 prevFinalized=396 newFinalized=411 targetNumber=412 sourceHash=0x20a8bb...
-```
-
-Same reading as attack 1: identical `prevFinalized=396` but a **different `sourceHash`** on the A
-and B branches means the two chains finalized independently, i.e. the attack succeeded.
+- At slot `999`, the benchmark finalizes height `997` while both attack branches remain at height `996`.
+- From slot `999` to `1087`, the benchmark reaches height `1085` while both attack branches remain
+  at `996`.
+- At slot `999`, `c1` and `c2` have accumulated difficulties `1998` and `1996`; afterward, the two
+  branches increase their difficulties alternately and remain close.
+- After the CVS switch, both attack branches resume finalization, producing conflicting finalized blocks.
 
 ### Repair
 
@@ -326,38 +299,26 @@ no separate Python virtual-environment command is required.
 ```bash
 cd node-deploy
 
-# Attack 1
-./test_attack_1_flow.sh
+# Q1: Violation of safety for the warm-up attack
+./test_attack_1_flow.sh \
+  --epoch-interval epoch_1000_interval_450 --turnlength8
 
-# Attack 2
+# Q2: Violation of safety for the committee divergence attack
+./test_attack_2_8_flow.sh \
+  --epoch-interval epoch_1000_interval_450
+
+# Q3: Impact of protocol parameters
+
+# Parameter variation: S=200, 3s, turnLength=1
+./test_attack_2_flow.sh \
+  --epoch-interval epoch_200_interval_3000
+
+# Parameter variation: S=200, 1s, turnLength=1
 ./test_attack_2_flow.sh
 
-# Attack 2 with turn length 8
+# Parameter variation: S=200, 1s, turnLength=8
 ./test_attack_2_8_flow.sh
-
-# Repair
-./repair.sh
-
-# Repair with turn length 8
-./repair_8.sh
 ```
-
-Optional parameter configurations can be passed as documented flags, for example:
-
-```bash
-./test_attack_2_8_flow.sh --epoch-interval epoch_1000_interval_450
-./repair_8.sh --epoch-interval epoch_1000_interval_450
-```
-
-Wait for the command to finish. Success is indicated by the final `... experiment flow finished`
-message and exit code `0`. If a run is interrupted, stop its cluster before retrying, for example:
-
-```bash
-./bsc_cluster_2.sh stop
-```
-
-The delivery experiment is separate: it requires three evaluator-controlled hosts and the SSH
-configuration described in [`repro/REPRODUCE.md`](repro/REPRODUCE.md).
 
 ## Source code
 
