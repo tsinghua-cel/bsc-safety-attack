@@ -205,8 +205,7 @@ The success sign is a final log line containing:
 The `--rm` option removes the finished container after the run. The flow scripts perform the
 build, initialization, cluster startup, checks, and cleanup inside the container.
 
-For the separate Delivery experiment (Q4: Feasibility of selective delivery), use the workflow
-under [`repro/`](repro/); it requires three evaluator-controlled hosts and SSH credentials.
+For the separate Delivery experiment (Q4: Feasibility of selective delivery),See [`repro/REPRODUCE.md`](repro/REPRODUCE.md) for the full guide. it requires three evaluator-controlled hosts and SSH credentials.
 
 ## Manual build & execution
 
