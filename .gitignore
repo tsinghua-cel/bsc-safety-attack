@@ -14,7 +14,7 @@
 /path
 
 /code/bsc.b
-/code/attack-3-code
+/code/delivery-experiment
 /code/attack-1-code
 /code/attack-2-code
 /code/repair-code
@@ -23,5 +23,6 @@
 /testdata/script/__pycache__
 
 /pem
+/attack_logs
 /attack_logs.b
 .DS_Store

@@ -3,9 +3,9 @@
 # cluster.sh — local driver to operate the 3-datacenter BSC cluster over SSH.
 #
 # Run from the repo root (where pem/ lives). Drives all three hosts:
-#   node 0..6   -> host1 (18.143.118.53,  pem/bsc-new-attack-1.pem)
-#   node 7..13  -> host2 (3.90.13.14,     pem/bsc-new-attack-2.pem)
-#   node 14..20 -> host3 (3.10.211.250,   pem/bsc-new-attack-3.pem)
+#   node 0..6   -> host1 (54.179.185.69,  pem/bsc-new-delivery-experiment1.pem)
+#   node 7..13  -> host2 (54.147.60.78,     pem/bsc-new-delivery-experiment2.pem)
+#   node 14..20 -> host3 (13.40.171.125,   pem/bsc-new-delivery-experiment3.pem)
 #
 # Commands:
 #   ./cluster.sh stop     stop all geth nodes on all 3 hosts
@@ -16,29 +16,30 @@
 #   ./cluster.sh result   show the [ATTACK][SG] first-seen block lines from Singapore
 #   ./cluster.sh check    show the [ATTACK] seal-gate lines from UK (verify b1/b2 + in-turn silence)
 #
-# Backup-block propagation attack experiment:
-#   Arm the attack by exporting ATTACK_SLOT (and optionally LEAD_TIME_MS) for `start`:
+# Backup-block propagation delivery experiment:
+#   Arm the delivery experiment by exporting ATTACK_SLOT (and optionally LEAD_TIME_MS) for `start`:
 #     ATTACK_SLOT=300 LEAD_TIME_MS=60 ./cluster.sh start
-#   The attack now REPEATS: it fires at ATTACK_SLOT, +ATTACK_PERIOD, +2*PERIOD, ...
+#   The delivery experiment now REPEATS: it fires at ATTACK_SLOT, +ATTACK_PERIOD, +2*PERIOD, ...
 #   for ATTACK_COUNT occurrences, so a single run yields many samples. The period
-#   defaults to validators*turnLength (21*8=168) so every attack slot has the
+#   defaults to validators*turnLength (21*8=168) so every delivery slot has the
 #   identical validator schedule (same US in-turn silenced, same b1/b2 eligible).
 #     ATTACK_SLOT=300 ATTACK_COUNT=100 LEAD_TIME_MS=60 ./cluster.sh start
-#   Then:  ./cluster.sh set   ;  wait until height >= last attack slot  ;  ./cluster.sh result
+#   Then:  ./cluster.sh set   ;  wait until height >= last delivery slot  ;  ./cluster.sh result
 #   `result` prints the per-slot b1/b2 winner table + the b1-vs-b2 summary over all slots.
-#   To get a single attack (old behaviour): ATTACK_PERIOD=0 (or ATTACK_COUNT=1).
+#   To get a single delivery slot (old behaviour): ATTACK_PERIOD=0 (or ATTACK_COUNT=1).
 #
 set -uo pipefail
 
-# ---- central config: hosts, pems, node split, attack defaults ------------
+# ---- central config: hosts, pems, node split, delivery defaults ------------
 # Edit repro/config.sh to reproduce on different servers (single source of truth).
 # It defines: HOSTS[], SG_IP/US_IP/UK_IP, ATTACK_SLOT/PERIOD/COUNT, B1_NODE/B2_NODE,
 # and REPO_DIR (the repo root). All paths below are relative to the repo root.
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/config.sh"
 repo_dir="${REPO_DIR}"
 cd "${repo_dir}"
+LAUNCHER_SOURCE="$(delivery_launcher_path)"
 
-# LEAD_TIME_MS is the only attack knob not in config.sh (it is swept per-run).
+# LEAD_TIME_MS is the only delivery knob not in config.sh (it is swept per-run).
 LEAD_TIME_MS="${LEAD_TIME_MS:-60}"  # extra delay (ms) before sending b1 -> Singapore (UK nodes)
                                     # NOTE: at slot 300 (turnLength=8 regime) the eligible
                                     # (not-recently-signed) UK backups are node14/17/18/20;
@@ -112,15 +113,15 @@ cmd_clean() {
     echo "all hosts cleaned (ready for a fresh start from height 0)."
 }
 
-start_host() { # pem ip start end logfile attack_env  (run with & ; redirects its own subshell)
+start_host() { # pem ip start end logfile delivery_env  (run with & ; redirects its own subshell)
     local pem=$1 ip=$2 s=$3 e=$4 log=$5 aenv=$6
     exec >"${log}" 2>&1
     echo "===== start ${ip} (node ${s}-${e}) ====="
-    [ -n "${aenv}" ] && echo "attack env: ${aenv}"
+    [ -n "${aenv}" ] && echo "delivery env: ${aenv}"
     ensure_embed_files "$pem" "$ip"
     # node-deploy/ is gitignored, so push the launcher script ourselves (git pull won't).
     echo "  [${ip}] syncing bsc_cluster_multi.sh"
-    scp -i "pem/$pem" "${SSH_OPTS[@]}" "${repo_dir}/node-deploy/bsc_cluster_multi.sh" \
+    scp -i "pem/$pem" "${SSH_OPTS[@]}" "${LAUNCHER_SOURCE}" \
         "ubuntu@${ip}:${REMOTE_ND}/bsc_cluster_multi.sh"
     run_ssh "$pem" "$ip" "
         ${REMOTE_PATH_EXPORT}
@@ -151,7 +152,7 @@ resolve_b1b2() {
 }
 
 cmd_start() {
-    # Optionally arm the attack: compute b1/b2 coinbases once, then pass per-host env.
+    # Optionally arm the delivery experiment: compute b1/b2 coinbases once, then pass per-host env.
     local b1="" b2="" armed=0
     if [ -n "${ATTACK_SLOT}" ] && [ "${ATTACK_SLOT}" != "0" ]; then
         read -r b1 b2 <<<"$(resolve_b1b2)"
@@ -211,13 +212,13 @@ cmd_status() {
     done
 }
 
-# Aggregate the Singapore vote outcome across ALL repeated attack slots.
-# For every (node, attack-height) the first-seen sibling (b1/b2) is the node's
+# Aggregate the Singapore vote outcome across ALL repeated delivery slots.
+# For every (node, delivery-height) the first-seen sibling (b1/b2) is the node's
 # vote at that slot. Per slot we take the majority over the 7 SG nodes, then
 # tally how many slots b1 vs b2 won — i.e. the 100-sample distribution.
 cmd_result() {
     IFS='|' read -r pem ip s e <<<"${HOSTS[0]}"   # host1 = Singapore
-    echo "==> [ATTACK][SG] per-slot vote across all attack slots @ ${ip}"
+    echo "==> [ATTACK][SG] per-slot vote across all delivery slots @ ${ip}"
     # Emit raw rows: "<node> <number> <label> <recvUnixMs>" for every SG receive log.
     local raw
     raw=$(run_ssh "$pem" "$ip" "
@@ -244,7 +245,7 @@ cmd_result() {
                 w=(c1>c2)?"b1":((c2>c1)?"b2":"tie"); if(w=="b1")b1w++; else if(w=="b2")b2w++; else tie++
                 printf "%-8s %5d %5d  %-6s\n",ht,c1,c2,w
             }
-            printf "\n=== SUMMARY over %d attack slots: b1 won %d, b2 won %d, tie %d ===\n",nslot,b1w,b2w,tie
+            printf "\n=== SUMMARY over %d delivery slots: b1 won %d, b2 won %d, tie %d ===\n",nslot,b1w,b2w,tie
         }'
 }
 
@@ -274,7 +275,7 @@ case "${1:-}" in
         echo "  stop    stop all nodes on all 3 hosts"
         echo "  clean   wipe chaindata/logs, keep genesis + keys + configs"
         echo "  start   git pull + make geth + install + init genesis + start nodes"
-        echo "          (arm attack: ATTACK_SLOT=300 LEAD_TIME_MS=60 ./cluster.sh start)"
+        echo "          (arm delivery: ATTACK_SLOT=300 LEAD_TIME_MS=60 ./cluster.sh start)"
         echo "  set     host1: register 21 validators into StakeHub"
         echo "  status  show peers + block height per host"
         echo "  result  show Singapore [ATTACK][SG] first-seen (which block SG voted)"

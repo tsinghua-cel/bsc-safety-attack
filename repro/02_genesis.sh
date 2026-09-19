@@ -9,10 +9,11 @@
 # `gen`'s init-network step).
 #
 # Usage:  repro/02_genesis.sh
-set -uo pipefail
+set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/config.sh"
 cd "${REPO_DIR}"
+LAUNCHER_SOURCE="$(delivery_launcher_path)"
 
 PATHX='export PATH=/usr/local/go/bin:/usr/local/bin:$PATH'
 P2P_BASE=30311
@@ -36,7 +37,7 @@ node_list() { local s=$1 e=$2 out=""; for ((i=s;i<=e;i++)); do out+="node${i} ";
 echo "===== PHASE 2: genesis on ${GEN_REGION} (${GEN_IP}) ====="
 
 echo "[sync] latest launcher + embed files to gen host"
-scp -i "${GKEY}" "${SSH_OPTS[@]}" "${REPO_DIR}/node-deploy/bsc_cluster_multi.sh" \
+scp -i "${GKEY}" "${SSH_OPTS[@]}" "${LAUNCHER_SOURCE}" \
     "${SSH_USER}@${GEN_IP}:~/${REMOTE_ND}/bsc_cluster_multi.sh"
 for f in "${EMBED_FILES[@]}"; do
     if ! ssh_gen "test -f ~/${REMOTE_REPO}/${f}"; then

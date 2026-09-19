@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # run_lead.sh <lead_ms> [count] [period] : one full experiment run at the given
-# LEAD_TIME_MS that collects <count> repeated-attack samples in a single run.
-#   clean -> start(attack) -> register -> wait until past the LAST attack slot -> result
+# LEAD_TIME_MS that collects <count> repeated delivery samples in a single run.
+#   clean -> start(delivery) -> register -> wait until past the LAST delivery slot -> result
 # Writes the Singapore per-slot vote summary to /tmp/lead_<L>_result.txt
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -22,9 +22,9 @@ uk_height() {
       "curl -s -X POST -H 'Content-Type: application/json' --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_blockNumber\",\"params\":[],\"id\":1}' http://127.0.0.1:${UK_HTTP} | jq -r .result" 2>/dev/null
 }
 
-# Some attack slots can stall the chain: if neither designated backup (b1/b2) is
+# Some delivery slots can stall the chain: if neither designated backup (b1/b2) is
 # eligible to seal at that slot (Parlia "signed recently"), a different validator
-# seals it, but the b1/b2 nodes reject that block (attack-slot import guard) and
+# seals it, but the b1/b2 nodes reject that block (delivery-slot import guard) and
 # fork off — the chain stops advancing. This is sporadic (depends on the per-run
 # schedule), so we detect the stall (UK height not advancing) and retry the whole
 # lead from a clean state. Tunable via MAX_TRIES / STALL_POLLS.
@@ -33,14 +33,23 @@ STALL_POLLS="${STALL_POLLS:-40}"   # ~40*6s = 4 min of no height progress => sta
 
 attempt() {   # clean -> start -> register -> wait; return 0 reached target, 1 stalled
     echo "########## LEAD=${L}ms : clean ##########"
-    "${HERE}/cluster.sh" clean >"/tmp/lead_${L}_clean.log" 2>&1
-    echo "########## LEAD=${L}ms : start (count=${COUNT} period=${PERIOD}, attacks ${SLOT0}..${LAST_SLOT}) ##########"
-    ATTACK_SLOT=$SLOT0 ATTACK_PERIOD=$PERIOD ATTACK_COUNT=$COUNT LEAD_TIME_MS="$L" "${HERE}/cluster.sh" start >"/tmp/lead_${L}_start.log" 2>&1
+    if ! "${HERE}/cluster.sh" clean >"/tmp/lead_${L}_clean.log" 2>&1; then
+        echo "  clean failed; retrying lead"
+        return 1
+    fi
+    echo "########## LEAD=${L}ms : start (count=${COUNT} period=${PERIOD}, delivery slots ${SLOT0}..${LAST_SLOT}) ##########"
+    if ! ATTACK_SLOT=$SLOT0 ATTACK_PERIOD=$PERIOD ATTACK_COUNT=$COUNT LEAD_TIME_MS="$L" "${HERE}/cluster.sh" start >"/tmp/lead_${L}_start.log" 2>&1; then
+        echo "  start failed; retrying lead"
+        return 1
+    fi
     grep -E "ATTACK armed|all hosts started|reported errors" "/tmp/lead_${L}_start.log" | tail -3
     echo "########## LEAD=${L}ms : register ##########"
-    "${HERE}/cluster.sh" set >"/tmp/lead_${L}_set.log" 2>&1
+    if ! "${HERE}/cluster.sh" set >"/tmp/lead_${L}_set.log" 2>&1; then
+        echo "  validator registration failed; retrying lead"
+        return 1
+    fi
     echo "registered $(grep -c 'send createValidator' "/tmp/lead_${L}_set.log") validators"
-    echo "########## LEAD=${L}ms : waiting to pass last attack slot ${LAST_SLOT} (target ${TARGET}) ##########"
+    echo "########## LEAD=${L}ms : waiting to pass last delivery slot ${LAST_SLOT} (target ${TARGET}) ##########"
     local last=-1 stuck=0 h
     for i in $(seq 1 4000); do
         h=$(uk_height); h=$((h))

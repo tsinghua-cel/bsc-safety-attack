@@ -20,7 +20,7 @@ is documented in [`repro/REPRODUCE.md`](repro/REPRODUCE.md).
   the four epoch/block-interval/turnLength configurations in Table 2 of the paper. The archived
   outputs for this evaluation are the Attack 2 CSVs under the four `testdata/<config>/` directories.
 - **Delivery experiment (paper Q4; backup-block propagation timing / vote steering).** A 21-validator BSC network is
-  spread across **three real datacenters** (Singapore / US Virginia / London). At each attack slot
+  spread across **three real datacenters** (Singapore / US Virginia / London). At each delivery slot
   the in-turn US validator is silenced and two London backups seal sibling blocks `b1`/`b2`; `b1`
   is routed only to Singapore and `b2` only to the US, with an extra `lead_time` delay applied to
   `b1`. By sweeping `lead_time` (30/60/75/90 ms) we locate the threshold (~75 ms) at which the
@@ -115,7 +115,7 @@ flow script `git checkout NAME` in the corresponding code repo before building; 
   - branches: `master` (= `epoch_200_interval_1000`), `epoch_200_interval_3000`
 - **`code/repair-8-code`** (repairs attack-2 turn-length-8) → `node-deploy/repair_8.sh`
   - branches: `master` (= `epoch_200_interval_1000`), `epoch_1000_interval_450`
-- **`code/attack-3-code`** → `repro/` scripts (multi-datacenter, **not** a `node-deploy` flow)
+- **`code/delivery-experiment`** → `repro/` scripts (multi-datacenter, **not** a `node-deploy` flow)
   - 3 datacenters (Singapore / US / London); driven end-to-end by `repro/run_all.sh`
     (provision → genesis → experiment) and configured from `repro/config.sh`. Sweeps
     `LEAD_TIME_MS`. See [`repro/REPRODUCE.md`](repro/REPRODUCE.md) for the full guide.
@@ -363,7 +363,7 @@ configuration described in [`repro/REPRODUCE.md`](repro/REPRODUCE.md).
   - attack 2 turn-length-8 code: `code/attack-2-turnlen-8-code` (`code/attack-2-turnlen-8-code.zip`)
   - repair code: `code/repair-code` (`code/repair-code.zip`)
   - repair turn-length-8 code: `code/repair-8-code` (`code/repair-8-code.zip`)
-  - delivery experiment (legacy multi-datacenter propagation-timing code): `code/attack-3-code` (`code/attack-3-code.zip`) — see [`repro/REPRODUCE.md`](repro/REPRODUCE.md)
+  - delivery experiment (geo-distributed propagation-timing code): `code/delivery-experiment` (`code/delivery-experiment.zip`) — see [`repro/REPRODUCE.md`](repro/REPRODUCE.md)
 - Node deployment scripts: [https://github.com/bnb-chain/node-deploy](https://github.com/bnb-chain/node-deploy)
 
 ## Contribution

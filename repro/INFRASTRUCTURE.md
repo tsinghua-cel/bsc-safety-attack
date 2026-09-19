@@ -55,12 +55,12 @@ Create three dedicated EC2 instances in the following AWS regions:
 | Region | AWS region identifier | Validators | Node indexes | Role |
 |---|---|---:|---|---|
 | Singapore | `ap-southeast-1` | 7 | `node0`–`node6` | Singapore-side honest validators; their first-seen sibling votes are measured |
-| US Virginia | `us-east-1` | 7 | `node7`–`node13` | US-side honest validators; the in-turn validator is silenced during attack slots |
+| US Virginia | `us-east-1` | 7 | `node7`–`node13` | US-side honest validators; the in-turn validator is silenced during delivery slots |
 | London | `eu-west-2` | 7 | `node14`–`node20` | Attacker-controlled backup validators that construct sibling blocks `b1` and `b2` |
 
 The node placement must remain consistent with `repro/config.sh` and the multi-host launcher.
 The London host is the recommended genesis-generation host because it also runs the two
-attack-controlled backup validators.
+experiment-controlled backup validators.
 
 ### 3.2 EC2 instance and operating-system configuration
 

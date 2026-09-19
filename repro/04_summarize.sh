@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 04_summarize.sh — merge every attack_logs/lead_<L>/result.txt into one
 # lead-labelled file: attack_logs/combined_results.txt
-set -uo pipefail
+set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/config.sh"
 cd "${REPO_DIR}"
@@ -10,16 +10,16 @@ OUT="attack_logs/combined_results.txt"
 mkdir -p attack_logs
 {
     echo "============================================================"
-    echo " BSC backup-block propagation attack — lead_time sweep"
+    echo " BSC delivery experiment — lead_time sweep"
     echo " Singapore per-slot vote (b1 -> SG direct, b2 -> via US)"
-    echo " ${ATTACK_COUNT} attack slots per lead, period ${ATTACK_PERIOD}"
+    echo " ${ATTACK_COUNT} delivery slots per lead, period ${ATTACK_PERIOD}"
     echo "============================================================"
     for L in ${LEADS}; do
         f="attack_logs/lead_${L}/result.txt"
         echo
         echo "########## lead_time = ${L} ms ##########"
         if [ -f "$f" ]; then
-            sed -n '/height/,/SUMMARY/p' "$f"
+            sed -n '/height/,/SUMMARY/p' "$f" | sed 's/attack slots/delivery slots/g'
         else
             echo "(no result.txt — lead ${L} not run yet)"
         fi

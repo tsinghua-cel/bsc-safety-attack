@@ -4,10 +4,12 @@
 # create-validator helper. Runs the 3 hosts in parallel. Idempotent.
 #
 # Usage:  repro/01_provision.sh
-set -uo pipefail
+set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/config.sh"
 cd "${REPO_DIR}"
+validate_local_inputs
+LAUNCHER_SOURCE="$(delivery_launcher_path)"
 
 # make sure the PEM keys are not group/world readable (ssh refuses otherwise)
 chmod 400 pem/*.pem 2>/dev/null || true
@@ -35,26 +37,39 @@ provision_one() { # region pem ip
         else
             git clone -b ${REPO_BRANCH} ${REPO_URL} ~/${REMOTE_REPO}
         fi
+        mkdir -p ~/${REMOTE_REPO}/code
+    "
+
+    # Upload the exact local archives instead of relying on whatever artifacts are
+    # currently present in the remote Git branch. This makes the reproduction use
+    # the delivery-experiment code and node-deploy branch from this checkout.
+    echo "[artifacts] syncing local node-deploy.zip and ${CODE_ZIP}..."
+    scp -i "${key}" "${SSH_OPTS[@]}" "${REPO_DIR}/node-deploy.zip" \
+        "${SSH_USER}@${ip}:~/${REMOTE_REPO}/node-deploy.zip"
+    scp -i "${key}" "${SSH_OPTS[@]}" "${REPO_DIR}/${CODE_ZIP}" \
+        "${SSH_USER}@${ip}:~/${REMOTE_REPO}/${CODE_ZIP}"
+
+    echo "[unpack] selecting node-deploy branch ${NODE_DEPLOY_BRANCH} and unpacking code..."
+    ssh -i "${key}" "${SSH_OPTS[@]}" "${SSH_USER}@${ip}" "
+        ${PATHX}
+        set -e
         cd ~/${REMOTE_REPO}
-        # node-deploy is shipped as a zip (gitignored); unpack if not present
-        if [ ! -d node-deploy/keys ]; then
-            echo '  unpacking node-deploy.zip'
+        # Re-unpack if the archive does not contain the required branch.
+        if [ ! -d node-deploy/.git ] || ! git -C node-deploy show-ref --verify --quiet refs/heads/${NODE_DEPLOY_BRANCH}; then
+            rm -rf node-deploy
             unzip -q -o node-deploy.zip
         fi
-        # the geth/bsc source tree is also shipped as a gitignored zip; unpack it
-        if [ ! -d ${CODE_DIR} ]; then
-            echo '  unpacking ${CODE_ZIP}'
-            unzip -q -o ${CODE_ZIP} -d code
-        fi
-        # the zip embeds a broken .git (config only, no HEAD); it breaks geth's
-        # version stamping (git tag -l --points-at HEAD). Drop it so the build
-        # discovers the outer repo's valid .git instead.
+        git -C node-deploy switch ${NODE_DEPLOY_BRANCH}
+        # Always refresh the delivery source from the local archive.
+        rm -rf ${CODE_DIR}
+        unzip -q -o ${CODE_ZIP} -d code
+        # The source archive may contain Git metadata; do not let it affect version stamping.
         rm -rf ${CODE_DIR}/.git
         mkdir -p ~/${REMOTE_ND}/bin
     "
 
     echo "[launcher] syncing latest bsc_cluster_multi.sh..."
-    scp -i "${key}" "${SSH_OPTS[@]}" "${REPO_DIR}/node-deploy/bsc_cluster_multi.sh" \
+    scp -i "${key}" "${SSH_OPTS[@]}" "${LAUNCHER_SOURCE}" \
         "${SSH_USER}@${ip}:~/${REMOTE_ND}/bsc_cluster_multi.sh"
 
     echo "[create-validator] building..."

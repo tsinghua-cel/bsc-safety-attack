@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # sweep_leads.sh : sweep LEAD_TIME_MS over several values, each as one run that
-# collects COUNT repeated-attack samples. After every lead finishes it:
+# collects COUNT repeated delivery samples. After every lead finishes it:
 #   - saves the per-slot vote table (cluster.sh result) locally
 #   - saves a per-node SG first-seen CSV (node,height,label,recvUnixMs)
 #   - archives the FULL node logs from all 3 clusters (sg/us/uk) into one folder
@@ -8,7 +8,7 @@
 #
 # Usage:  ./sweep_leads.sh                 # leads 30 60 75 90, 10 samples each
 #         LEADS="30 60" COUNT=20 ./sweep_leads.sh
-set -uo pipefail
+set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/config.sh"
 cd "${REPO_DIR}"
@@ -32,7 +32,7 @@ for L in "${LEADS[@]}"; do
     echo "==================================================================="
     echo "##### SWEEP lead=${L}ms  (count=${COUNT}, period=${PERIOD}) #####"
     echo "==================================================================="
-    # one full run: clean -> start(attack) -> register -> wait past last slot -> result
+    # one full run: clean -> start(delivery) -> register -> wait past last slot -> result
     COUNT="$COUNT" PERIOD="$PERIOD" "${HERE}/run_lead.sh" "$L" "$COUNT" "$PERIOD"
 
     d="${OUT}/lead_${L}"
@@ -41,7 +41,7 @@ for L in "${LEADS[@]}"; do
     cp "/tmp/lead_${L}_start.log"  "$d/start.log"     2>/dev/null
     cp "/tmp/lead_${L}_set.log"    "$d/register.log"  2>/dev/null
 
-    # per-node SG first-seen CSV (one row per node per attack height it observed)
+    # per-node SG first-seen CSV (one row per node per delivery height it observed)
     IFS='|' read -r reg pem ip <<<"${ARCHIVE_HOSTS[0]}"
     echo "node,height,label,recvUnixMs" > "$d/sg_pernode.csv"
     ssh -i "pem/${pem}" "${OPTS[@]}" "${SSH_USER}@${ip}" "

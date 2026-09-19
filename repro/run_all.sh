@@ -11,9 +11,11 @@
 #   repro/run_all.sh --from genesis  # skip provision (already done)
 #   repro/run_all.sh --from experiment
 #   repro/run_all.sh --only provision
-set -uo pipefail
+set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/config.sh"
+
+validate_local_inputs
 
 FROM="provision"; ONLY=""
 while [ $# -gt 0 ]; do
@@ -23,6 +25,12 @@ while [ $# -gt 0 ]; do
         *) echo "unknown arg: $1"; exit 1 ;;
     esac
 done
+
+case "${FROM}" in provision|genesis|experiment) ;; *) echo "invalid --from: ${FROM}" >&2; exit 1 ;; esac
+if [ -n "${ONLY}" ] && [[ ! " provision genesis experiment " == *" ${ONLY} "* ]]; then
+    echo "invalid --only: ${ONLY}" >&2
+    exit 1
+fi
 
 run_phase() { # name script
     local name=$1 script=$2
@@ -48,4 +56,4 @@ should_run genesis     && run_phase genesis    02_genesis.sh
 should_run experiment  && run_phase experiment 03_experiment.sh
 
 echo
-echo "ALL DONE. Combined results: attack_logs/combined_results.txt"
+echo "ALL DONE. Delivery results: attack_logs/combined_results.txt"
