@@ -282,108 +282,78 @@ When both branches show the identical `sourceHash` for the same `targetNumber`, 
 healed and the repair succeeded. The collected `repair_*` CSVs under `testdata/<config>/csv/`
 capture this convergence behavior.
 
-## Appendix
+## Manual local run
 
-This section outlines the complete manual installation process: environment setup, dependency
-installation, and attack execution from source.
+This path runs the experiments directly from the current repository, without Docker. Run the
+experiment commands as your normal user; use `sudo` only for installing system dependencies.
+Run one experiment at a time.
 
-> ⚠️ **Before you begin**, ensure the following are installed (matching `install-dev.sh`):
+### 1. Prepare `node-deploy`
 
-- Ubuntu Linux (the Docker and multi-host reproduction references use Ubuntu 24.04; local flows
-  may also be run on the Ubuntu versions documented by their environment)
-- Go: 1.21 or newer; the included modules may select a newer toolchain when required
-- Node.js: 18.20.2, npm: 6.14.6
-- Foundry: v1.2.1
-- python3: 3.12+ (with `python3.12-venv`)
-- poetry
-- jq, unzip
+From the repository root, unpack the deployment scripts and keys:
 
-### Setup steps
+```bash
+unzip -q -o node-deploy.zip
+```
 
-1. Install system dependencies and toolchains:
+### 2. Install dependencies
 
 ```bash
 chmod +x install-dev.sh
 sudo ./install-dev.sh
+
+# install-dev.sh installs Go and Foundry for root; expose the tools used by the flow
+export PATH="/usr/local/go/bin:$PATH"
+sudo install -m 0755 /root/.foundry/bin/forge /usr/local/bin/forge
+
+# optional verification
+go version
+node --version
+npm --version
+poetry --version
+forge --version
 ```
 
-2. Create and activate a Python virtual environment, then install requirements:
+The flow scripts create `node-deploy/.venv` and install the Python requirements automatically;
+no separate Python virtual-environment command is required.
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip3 install -r node-deploy/requirements.txt
-```
-
-The flow scripts below also create/activate `node-deploy/.venv` automatically if you skip this step.
-
-### Launching experiments
-
-Run each experiment from `node-deploy/`. Recompile happens automatically inside each flow script
-(`make geth` against the matching `code/*` repo). We recommend running each attack in a clean,
-isolated environment and **not** running different attacks in parallel under the same environment.
-
-1. Attack 1
+### 3. Run one experiment
 
 ```bash
 cd node-deploy
+
+# Attack 1
 ./test_attack_1_flow.sh
-./test_attack_1_flow.sh --turnlength8
-./test_attack_1_flow.sh --epoch-interval epoch_200_interval_3000
-./test_attack_1_flow.sh --epoch-interval epoch_1000_interval_450 --turnlength8
-```
 
-The attack-1 flow:
-
-- Builds `code/attack-1-code` `geth` with `make geth` (after checking out the requested branch).
-- Builds `node-deploy/create-validator` and installs the binary into `node-deploy/bin/geth`.
-- Prepares the Python venv and installs `node-deploy/requirements.txt`.
-- Resets and starts the 21-node cluster.
-- Waits for height `201`, then adds Group A validators `21..31` (via node0 RPC `8545`) and Group B
-  validators `32..41` (via node10 RPC `8555`).
-- Waits for height `400`, copies `node11` to `node11-b`, and starts the B-side instance with
-  `BSC_NETWORK_SPLIT_GROUP=B`.
-- Monitors node0 and node10 until both print `Parlia finalized block number changed`, then stops
-  the cluster.
-
-2. Attack 2
-
-```bash
-cd node-deploy
+# Attack 2
 ./test_attack_2_flow.sh
-./test_attack_2_flow.sh --epoch-interval epoch_200_interval_3000
-```
 
-3. Attack 2 (turn length 8)
-
-```bash
-cd node-deploy
+# Attack 2 with turn length 8
 ./test_attack_2_8_flow.sh
-./test_attack_2_8_flow.sh --epoch-interval epoch_1000_interval_450
+
+# Repair
+./repair.sh
+
+# Repair with turn length 8
+./repair_8.sh
 ```
 
-The attack-2 flow:
-
-- Builds the matching `geth` (`code/attack-2-code` or `code/attack-2-turnlen-8-code`) and
-  `create-validator`, installs the binary into `node-deploy/bin/geth`.
-- Resets and starts the 21-node cluster (`bsc_cluster_2.sh` / `bsc_cluster_2_8.sh`).
-- Waits for height `201`, then registers A-side validators `21..31` and B-side validators `32..41`.
-- Waits for branch-local finalization after height `411`, then waits until both branches exceed the
-  configured height before stopping the cluster.
-
-4. Repair experiments
+Optional parameter configurations can be passed as documented flags, for example:
 
 ```bash
-cd node-deploy
-./repair.sh
-./repair.sh --epoch-interval epoch_200_interval_3000
-./repair_8.sh
+./test_attack_2_8_flow.sh --epoch-interval epoch_1000_interval_450
 ./repair_8.sh --epoch-interval epoch_1000_interval_450
 ```
 
-`repair.sh` runs the attack-2 flow with `code/repair-code`, and `repair_8.sh` runs the attack-2
-turn-length-8 flow with `code/repair-8-code`. Both lift the network partition once the fork window
-ends so you can observe whether the branches converge.
+Wait for the command to finish. Success is indicated by the final `... experiment flow finished`
+message and exit code `0`. If a run is interrupted, stop its cluster before retrying, for example:
+
+```bash
+./bsc_cluster_2.sh stop
+```
+
+The delivery experiment is separate: it requires three evaluator-controlled hosts and the SSH
+configuration described in [`repro/REPRODUCE.md`](repro/REPRODUCE.md).
 
 ## Source code
 
