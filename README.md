@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This repository reproduces four paper experiment families: Attack 1, Attack 2, parameter-adjustment
+This repository contains the code used to reproduce the four experiment families presented in the paper “Be Careful about Validator Switch: A Safety Attack to Binance Smart Chain”: Attack 1, Attack 2, parameter-adjustment
 experiments, and a geo-distributed delivery experiment. Attacks 1 and 2, the parameter-adjustment
 experiments, and the supplementary repair workflows use a local 21-validator BSC (v1.6.6) testbed.
 The delivery experiment uses a separate geo-distributed three-region testbed; its full AWS workflow
