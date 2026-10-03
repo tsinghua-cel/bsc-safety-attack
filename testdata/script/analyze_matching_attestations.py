@@ -280,7 +280,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--split-height",
         type=int,
-        default=398,
+        required=True,
         help="last common height before C_A/C_B attestation series starts",
     )
     parser.add_argument(

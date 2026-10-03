@@ -231,7 +231,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--start", type=int, default=300)
     parser.add_argument("--end", type=int, default=440)
-    parser.add_argument("--split-height", type=int, default=398)
+    parser.add_argument("--split-height", type=int, required=True)
     parser.add_argument("--benchmark-lag", type=int, default=None)
     return parser.parse_args()
 

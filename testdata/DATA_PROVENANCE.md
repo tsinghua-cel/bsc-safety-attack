@@ -57,6 +57,37 @@ The included directories encode the tested parameters:
 | `epoch_200_interval_1000_turnlength_8` | 200 | 1000 ms | 8 |
 | `epoch_1000_interval_450_turnlength_8` | 1000 | 450 ms | 8 |
 
+### Analysis parameters
+
+All `analyze_*.py` scripts require an explicit `--split-height`.
+
+| Dataset directory | `--start` | `--end` | `--split-height` | Attestation log name | Attack 1 source branch |
+|---|---:|---:|---:|---|---|
+| `epoch_200_interval_1000_turnlength_1` | 300 | 440 | 398 | `bsc.log.2026-06-04_13` | `master` |
+| `epoch_200_interval_3000_turnlength_1` | 300 | 440 | 398 | `bsc.log.2026-06-04_14` | `epoch_200_interval_3000` |
+| `epoch_200_interval_1000_turnlength_8` | 300 | 550 | 398 | `bsc.log.2026-06-04_13` | `master` |
+| `epoch_1000_interval_450_turnlength_8` | 300 | 1200 | 998 | `bsc.log.2026-06-04_23` | `epoch_1000_interval_450` |
+
+For attestation analysis, use `params/validators.go` from the listed branch in
+`code/attack-1-code.zip`, with `--count-field group --fill forward`.
+
+Example: regenerate epoch-1000 attestations from the repository root:
+
+```bash
+ROOT="$(pwd)"
+WORK="$(mktemp -d)"
+DATASET="epoch_1000_interval_450_turnlength_8"
+unzip -q "$ROOT/testdata/$DATASET/data/attack-1-testdata.zip" -d "$WORK/logs"
+unzip -q "$ROOT/code/attack-1-code.zip" -d "$WORK/source"
+git -C "$WORK/source/attack-1-code" show epoch_1000_interval_450:params/validators.go \
+  > "$WORK/validators.go"
+python3 "$ROOT/testdata/script/analyze_matching_attestations.py" \
+  --start 300 --end 1200 --split-height 998 \
+  --log-root "$WORK/logs/.local" --log-name bsc.log.2026-06-04_23 \
+  --validators-file "$WORK/validators.go" --count-field group --fill forward \
+  --output "$WORK/matching_attestations.new.csv"
+```
+
 ### Collection times recorded in the logs
 
 The following times are derived from the timestamps in the archived `bsc.log` files. The

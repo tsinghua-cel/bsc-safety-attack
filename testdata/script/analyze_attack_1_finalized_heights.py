@@ -147,7 +147,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--split-height",
         type=int,
-        default=398,
+        required=True,
         help="height where the two branches start to split",
     )
     parser.add_argument(
