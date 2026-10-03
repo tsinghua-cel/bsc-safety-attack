@@ -3,7 +3,7 @@
 #
 # Every script under repro/ (and cluster.sh / sweep_leads.sh / run_lead.sh) sources
 # this file. To reproduce on different machines, edit ONLY this file: put your own
-# server IPs, the matching PEM key file names (under pem/), and the git repo/branch.
+# server IPs and the matching PEM key file names (under pem/).
 #
 # Topology (21 validators total, split across 3 hosts by node index):
 #   node 0..6   -> Singapore (sg)   [also: in-experiment "victim votes" are read here]
@@ -21,13 +21,10 @@ SSH_USER="ubuntu"
 # owns the b1/b2 backups). The generated node dirs are then distributed to the others.
 GEN_REGION="uk"
 
-# ---- source code ----
-REPO_URL="https://github.com/erick785/bsc-new-attack-experiment.git"
-REPO_BRANCH="dev"
-REMOTE_REPO="bsc-new-attack-experiment"      # clone dir name under remote $HOME
+# ---- local source archives and remote workspace ----
+REMOTE_REPO="bsc-safety-attack"      # workspace name under remote $HOME
 REMOTE_ND="${REMOTE_REPO}/node-deploy"
-NODE_DEPLOY_BRANCH="${NODE_DEPLOY_BRANCH:-delivery-experiment}"
-# The modified geth/bsc source tree. It is shipped as a gitignored zip (like the
+# The modified geth/bsc source tree. It is shipped as a local zip (like the
 # other code variants) and unpacked on each host; CODE_DIR is where it lands.
 CODE_DIR="code/delivery-experiment"                # source tree to build (was code/bsc)
 CODE_ZIP="code/delivery-experiment.zip"            # zip that unpacks to ${CODE_DIR}
@@ -54,8 +51,7 @@ SSH_OPTS=(-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLeve
 # resolve the repo root regardless of where a script is invoked from
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# Resolve the delivery launcher even when the local node-deploy checkout is on `main`.
-# The delivery branch is bundled in node-deploy.zip and is the source of truth for this flow.
+# Resolve the Q4 launcher from the bundled node-deploy `main` branch when needed.
 delivery_launcher_path() {
     local direct="${REPO_DIR}/node-deploy/bsc_cluster_multi.sh"
     if [ -f "${direct}" ]; then
@@ -65,9 +61,9 @@ delivery_launcher_path() {
     if [ ! -d "${REPO_DIR}/node-deploy/.git" ]; then
         unzip -q -o "${REPO_DIR}/node-deploy.zip" -d "${REPO_DIR}"
     fi
-    local cached="${TMPDIR:-/tmp}/delivery-experiment-bsc_cluster_multi-${UID}.sh"
+    local cached="${TMPDIR:-/tmp}/q4-bsc_cluster_multi-${UID}.sh"
     if [ ! -s "${cached}" ]; then
-        git -C "${REPO_DIR}/node-deploy" show "${NODE_DEPLOY_BRANCH}:bsc_cluster_multi.sh" >"${cached}"
+        git -C "${REPO_DIR}/node-deploy" show "main:bsc_cluster_multi.sh" >"${cached}"
         chmod 755 "${cached}"
     fi
     echo "${cached}"

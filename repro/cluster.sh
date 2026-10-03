@@ -10,7 +10,7 @@
 # Commands:
 #   ./cluster.sh stop     stop all geth nodes on all 3 hosts
 #   ./cluster.sh clean    wipe chaindata/logs on all 3 hosts, KEEP genesis + keys + configs
-#   ./cluster.sh start    git pull + make geth + install + init genesis + start nodes (all 3 hosts)
+#   ./cluster.sh start    unpack local archive + make geth + install + init genesis + start nodes (all 3 hosts)
 #   ./cluster.sh set      host1: register all 21 validators into StakeHub
 #   ./cluster.sh status   show peers + block height of one node per host
 #   ./cluster.sh result   show the [ATTACK][SG] first-seen block lines from Singapore
@@ -52,7 +52,6 @@ region_for_idx() {
     else echo uk; fi
 }
 
-REMOTE_REPO="bsc-new-attack-experiment"          # relative to remote $HOME
 REMOTE_ND="${REMOTE_REPO}/node-deploy"
 REMOTE_PATH_EXPORT='export PATH=/usr/local/go/bin:/usr/local/bin:$PATH'
 RPC_NODE0="http://127.0.0.1:8545"
@@ -119,7 +118,7 @@ start_host() { # pem ip start end logfile delivery_env  (run with & ; redirects 
     echo "===== start ${ip} (node ${s}-${e}) ====="
     [ -n "${aenv}" ] && echo "delivery env: ${aenv}"
     ensure_embed_files "$pem" "$ip"
-    # node-deploy/ is gitignored, so push the launcher script ourselves (git pull won't).
+    # Refresh the launcher from the local artifact, not a remote Git repository.
     echo "  [${ip}] syncing bsc_cluster_multi.sh"
     scp -i "pem/$pem" "${SSH_OPTS[@]}" "${LAUNCHER_SOURCE}" \
         "ubuntu@${ip}:${REMOTE_ND}/bsc_cluster_multi.sh"
@@ -127,8 +126,7 @@ start_host() { # pem ip start end logfile delivery_env  (run with & ; redirects 
         ${REMOTE_PATH_EXPORT}
         set -e
         cd ~/${REMOTE_REPO}
-        echo '[git pull]'; git pull --ff-only
-        # source tree is a gitignored zip, so re-unpack to pick up committed changes
+        # Build the archive uploaded by Phase 1; do not update from GitHub.
         echo '[unpack code]'; unzip -q -o ${CODE_ZIP} -d code
         # zip embeds a broken .git (config only) that breaks geth version stamping
         rm -rf ${CODE_DIR}/.git
@@ -274,7 +272,7 @@ case "${1:-}" in
         echo "Usage: repro/cluster.sh {stop|clean|start|set|status|result|check}"
         echo "  stop    stop all nodes on all 3 hosts"
         echo "  clean   wipe chaindata/logs, keep genesis + keys + configs"
-        echo "  start   git pull + make geth + install + init genesis + start nodes"
+        echo "  start   unpack local archive + make geth + install + init genesis + start nodes"
         echo "          (arm delivery: ATTACK_SLOT=300 LEAD_TIME_MS=60 ./cluster.sh start)"
         echo "  set     host1: register 21 validators into StakeHub"
         echo "  status  show peers + block height per host"

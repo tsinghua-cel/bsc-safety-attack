@@ -78,9 +78,6 @@ SG_PEM="bsc-new-delivery-experiment1.pem"; SG_IP="54.179.185.69"; SG_START=0;  S
 US_PEM="bsc-new-delivery-experiment2.pem"; US_IP="54.147.60.78";  US_START=7;  US_END=13
 UK_PEM="bsc-new-delivery-experiment3.pem"; UK_IP="13.40.171.125"; UK_START=14; UK_END=20
 
-REPO_URL="https://github.com/erick785/bsc-new-attack-experiment.git"
-REPO_BRANCH="dev"
-
 ATTACK_SLOT_DEFAULT=300     # first delivery height
 ATTACK_PERIOD=168           # repeat interval = validators*turnLength
 ATTACK_COUNT=10             # delivery samples per lead
@@ -109,38 +106,6 @@ The IPs above are the currently configured delivery deployment. Replace them for
 > the validator set/order, pick eligible ones (Phase 3 has a safety net that simply
 > skips a slot rather than stalling the chain if neither b1 nor b2 is eligible).
 
-### Select the `node-deploy` branch (required)
-
-`REPO_BRANCH` above selects the outer `bsc-new-attack-experiment` repository; it does
-not select the separate `node-deploy` repository. The bundled `node-deploy.zip` defaults to
-`main` for the local experiments. This delivery workflow switches it to the
-`delivery-experiment` branch, which provides `bsc_cluster_multi.sh` and the matching deployment
-scripts. `node-deploy` is distributed as `node-deploy.zip` from the outer repository;
-it does not need to be fetched from or pushed to the upstream `node-deploy` remote.
-
-Before running Phase 1, unpack `node-deploy.zip` if needed and switch the local checkout to
-`delivery-experiment`:
-
-```bash
-unzip -q -o node-deploy.zip
-git -C node-deploy switch delivery-experiment
-git -C node-deploy branch --show-current   # should print: delivery-experiment
-```
-
-The archive intentionally includes the `node-deploy` Git metadata and the
-`delivery-experiment` ref, so a fresh Phase 1 unpack can use this branch without network access
-to the `node-deploy` repository. If a server already has an older unpacked copy,
-replace it with the current archive and switch explicitly:
-
-```bash
-ssh -i pem/<region-key>.pem ubuntu@<region-ip> \
-  'cd ~/bsc-new-attack-experiment && rm -rf node-deploy && unzip -q -o node-deploy.zip && git -C node-deploy switch delivery-experiment && git -C node-deploy branch --show-current'
-```
-
-Do not use `node-deploy/main` for this reproduction; the outer repository's
-`REPO_BRANCH` and the inner `node-deploy` branch are selected independently.
-
----
 
 ## 4. Run the experiment
 
@@ -159,7 +124,7 @@ roughly **1.5–2 hours** (most of it is producing ~1800 blocks per lead).
 ### Or phase by phase
 
 ```bash
-repro/01_provision.sh     # login + toolchain + clone + unpack node-deploy + unpack code zip + build create-validator
+repro/01_provision.sh     # login + toolchain + upload local archives + unpack + build create-validator
 repro/02_genesis.sh       # generate genesis + 21 configs, distribute node dirs to the 3 hosts
 repro/03_experiment.sh    # sweep lead_time, collect votes, download all logs
 ```
@@ -188,7 +153,7 @@ ATTACK_COUNT=100      repro/03_experiment.sh   # 100 samples per lead (~2h each)
 |--------|-------|--------|
 | `config.sh` | — | single source of truth (IPs, PEMs, node split, attack knobs) |
 | `remote_bootstrap.sh` | 1 | runs **on each server**: installs Go/Foundry/Node/Python/jq, symlinks to `/usr/local/bin` |
-| `01_provision.sh` | 1 | SSH login check → bootstrap → `git clone -b dev` → unzip `node-deploy.zip` + `code/delivery-experiment.zip` → build `create-validator` (3 hosts in parallel) |
+| `01_provision.sh` | 1 | SSH login check → bootstrap → create remote workspace → upload local archives → unzip `node-deploy.zip` + `code/delivery-experiment.zip` → build `create-validator` (3 hosts in parallel) |
 | `02_genesis.sh` | 2 | build `geth` on the UK host → `bsc_cluster_multi.sh gen` (keys, genesis, 21 configs, **rewrite `127.0.0.1` enode → public IPs**) → tar & distribute node0-6→SG, node7-13→US, `genesis.json`→all |
 | `03_experiment.sh` | 3 | drives `sweep_leads.sh` over `LEADS`, then `04_summarize.sh` |
 | `04_summarize.sh` | 3 | merge all `result.txt` into `attack_logs/combined_results.txt` |
@@ -197,7 +162,7 @@ ATTACK_COUNT=100      repro/03_experiment.sh   # 100 samples per lead (~2h each)
 Underlying engine (also under `repro/`, reused by the above; safe to call directly):
 
 - `repro/cluster.sh` — `stop|clean|start|set|status|result|check` across all 3 hosts
-  (`start` = `git pull` + `make geth` + init + launch; `set` = register 21 validators).
+  (`start` = unpack uploaded archive + `make geth` + init + launch; `set` = register 21 validators).
 - `repro/run_lead.sh <lead> [count] [period]` — one full run for a single lead_time.
 - `repro/sweep_leads.sh` — loop `run_lead.sh` over `LEADS`, archive logs per lead.
 - `node-deploy/bsc_cluster_multi.sh` — the remote launcher (`gen|start|stop|register`).

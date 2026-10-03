@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # run_all.sh — one-command reproduction of the whole experiment.
-#   PHASE 1  provision   (login + toolchain + clone + unpack node-deploy + build create-validator)
+#   PHASE 1  provision   (login + toolchain + upload local archives + unpack + build create-validator)
 #   PHASE 2  genesis      (generate shared genesis + 21 configs, distribute to the 3 hosts)
 #   PHASE 3  experiment   (sweep lead_time, collect Singapore votes + download all logs)
 #
-# Edit repro/config.sh FIRST (server IPs, PEM file names, branch).
+# Edit repro/config.sh FIRST (server IPs, PEM file names, deployment branch).
 #
 # Usage:
 #   repro/run_all.sh                 # all three phases

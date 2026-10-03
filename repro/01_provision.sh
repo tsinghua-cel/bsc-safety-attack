@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 01_provision.sh — PHASE 1: log in to all 3 servers, install the toolchain,
-# clone the repo (dev), unpack node-deploy (keys/genesis tooling), build the
+# upload local archives, unpack node-deploy (keys/genesis tooling), build the
 # create-validator helper. Runs the 3 hosts in parallel. Idempotent.
 #
 # Usage:  repro/01_provision.sh
@@ -28,39 +28,29 @@ provision_one() { # region pem ip
     scp -i "${key}" "${SSH_OPTS[@]}" "${HERE}/remote_bootstrap.sh" "${SSH_USER}@${ip}:~/remote_bootstrap.sh"
     ssh -i "${key}" "${SSH_OPTS[@]}" "${SSH_USER}@${ip}" "bash ~/remote_bootstrap.sh"
 
-    echo "[repo] clone/update ${REPO_BRANCH}..."
-    ssh -i "${key}" "${SSH_OPTS[@]}" "${SSH_USER}@${ip}" "
-        ${PATHX}
-        set -e
-        if [ -d ~/${REMOTE_REPO}/.git ]; then
-            cd ~/${REMOTE_REPO} && git fetch origin && git checkout ${REPO_BRANCH} && git pull --ff-only
-        else
-            git clone -b ${REPO_BRANCH} ${REPO_URL} ~/${REMOTE_REPO}
-        fi
-        mkdir -p ~/${REMOTE_REPO}/code
-    "
+    echo "[workspace] creating remote directory..."
+    ssh -i "${key}" "${SSH_OPTS[@]}" "${SSH_USER}@${ip}" \
+        "mkdir -p ~/${REMOTE_REPO}/code"
 
-    # Upload the exact local archives instead of relying on whatever artifacts are
-    # currently present in the remote Git branch. This makes the reproduction use
-    # the delivery-experiment code and node-deploy branch from this checkout.
+    # Use the local archives; the remote workspace does not need an outer Git repo.
     echo "[artifacts] syncing local node-deploy.zip and ${CODE_ZIP}..."
     scp -i "${key}" "${SSH_OPTS[@]}" "${REPO_DIR}/node-deploy.zip" \
         "${SSH_USER}@${ip}:~/${REMOTE_REPO}/node-deploy.zip"
     scp -i "${key}" "${SSH_OPTS[@]}" "${REPO_DIR}/${CODE_ZIP}" \
         "${SSH_USER}@${ip}:~/${REMOTE_REPO}/${CODE_ZIP}"
 
-    echo "[unpack] selecting node-deploy branch ${NODE_DEPLOY_BRANCH} and unpacking code..."
+    echo "[unpack] using node-deploy main branch and unpacking code..."
     ssh -i "${key}" "${SSH_OPTS[@]}" "${SSH_USER}@${ip}" "
         ${PATHX}
         set -e
         cd ~/${REMOTE_REPO}
-        # Re-unpack if the archive does not contain the required branch.
-        if [ ! -d node-deploy/.git ] || ! git -C node-deploy show-ref --verify --quiet refs/heads/${NODE_DEPLOY_BRANCH}; then
+        # Re-unpack if the archive does not contain the required main branch.
+        if [ ! -d node-deploy/.git ] || ! git -C node-deploy show-ref --verify --quiet refs/heads/main; then
             rm -rf node-deploy
             unzip -q -o node-deploy.zip
         fi
-        git -C node-deploy switch ${NODE_DEPLOY_BRANCH}
-        # Always refresh the delivery source from the local archive.
+        git -C node-deploy switch main
+        # Always refresh the delivery source tree from the local archive.
         rm -rf ${CODE_DIR}
         unzip -q -o ${CODE_ZIP} -d code
         # The source archive may contain Git metadata; do not let it affect version stamping.
