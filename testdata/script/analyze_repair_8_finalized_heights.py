@@ -22,11 +22,15 @@ FINALITY_RE = re.compile(
 )
 IMPORTED_RE = re.compile(r'Imported new chain segment".*?\bnumber=(?P<number>\d+)')
 NODE_DIR_RE = re.compile(r"node(?P<node>\d+)$")
-COMMENT_NODE_RE = re.compile(r'"(?P<addr>0x[0-9a-fA-F]+)":\s*"[^"]+",\s*//\s*(?P<node>\d+)')
+COMMENT_NODE_RE = re.compile(
+    r'^[ \t]*(?://[ \t]*)?"(?P<addr>0x[0-9a-fA-F]+)"[ \t]*:[ \t]*"[^"]+"[ \t]*,[ \t]*//[ \t]*(?P<node>\d+)[ \t]*$',
+    re.M,
+)
 VAR_BLOCK_RE = re.compile(
-    r"var\s+(?P<name>ValidatorsAddA|ValidatorsAddB|after487LegacyTargetsA|after487LegacyTargetsB)"
-    r"\s*=\s*(?:map\[string\]string|(?:\[\]string))\s*\{(?P<body>.*?)\n\}",
-    re.S,
+    r"^[ \t]*var\s+(?P<name>ValidatorsAddA|ValidatorsAddB|after487LegacyTargetsA|after487LegacyTargetsB)"
+    r"\s*=\s*(?:map\[string\]string|(?:\[\]string))\s*\{"
+    r"(?P<body>.*?)^[ \t]*\}",
+    re.S | re.M,
 )
 MAP_ENTRY_RE = re.compile(r'"(?P<addr>0x[0-9a-fA-F]+)":')
 CONST_RE = re.compile(r"\b(?P<name>expAddr\w+)\s*=\s*\"(?P<addr>0x[0-9a-fA-F]+)\"")
@@ -55,17 +59,16 @@ def normalize(addr: str) -> str:
 
 def parse_validators(validators_file: Path) -> tuple[set[str], set[str]]:
     text = validators_file.read_text(encoding="utf-8", errors="replace")
-    constants = {m.group("name"): normalize(m.group("addr")) for m in CONST_RE.finditer(text)}
+    declarations = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+    constants = {m.group("name"): normalize(m.group("addr")) for m in CONST_RE.finditer(declarations)}
     addr_to_node: dict[str, str] = {}
     for match in COMMENT_NODE_RE.finditer(text):
-        # The first large commented block uses real node indexes. Later comments may
-        # be short address labels such as 50/511, so do not overwrite earlier data.
         addr_to_node.setdefault(normalize(match.group("addr")), match.group("node"))
 
     groups: dict[str, set[str]] = {"A": set(), "B": set()}
-    for match in VAR_BLOCK_RE.finditer(text):
+    for match in VAR_BLOCK_RE.finditer(declarations):
         name = match.group("name")
-        body = match.group("body")
+        body = "\n".join(line.split("//", 1)[0] for line in match.group("body").splitlines())
         branch = "A" if name.endswith("A") else "B"
         addresses: set[str] = set()
 
