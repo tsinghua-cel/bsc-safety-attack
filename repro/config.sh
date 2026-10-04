@@ -24,7 +24,7 @@ GEN_REGION="uk"
 # ---- local source archives and remote workspace ----
 REMOTE_REPO="bsc-safety-attack"      # workspace name under remote $HOME
 REMOTE_ND="${REMOTE_REPO}/node-deploy"
-# The modified geth/bsc source tree. It is shipped as a local zip (like the
+# The modified geth/bsc source tree. It is shipped as a gitignored zip (like the
 # other code variants) and unpacked on each host; CODE_DIR is where it lands.
 CODE_DIR="code/delivery-experiment"                # source tree to build (was code/bsc)
 CODE_ZIP="code/delivery-experiment.zip"            # zip that unpacks to ${CODE_DIR}
@@ -51,7 +51,8 @@ SSH_OPTS=(-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLeve
 # resolve the repo root regardless of where a script is invoked from
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# Resolve the Q4 launcher from the bundled node-deploy `main` branch when needed.
+# Resolve the delivery launcher from the bundled node-deploy/main checkout.
+# The launcher is shipped in node-deploy.zip and is the source of truth for this flow.
 delivery_launcher_path() {
     local direct="${REPO_DIR}/node-deploy/bsc_cluster_multi.sh"
     if [ -f "${direct}" ]; then
@@ -61,7 +62,7 @@ delivery_launcher_path() {
     if [ ! -d "${REPO_DIR}/node-deploy/.git" ]; then
         unzip -q -o "${REPO_DIR}/node-deploy.zip" -d "${REPO_DIR}"
     fi
-    local cached="${TMPDIR:-/tmp}/q4-bsc_cluster_multi-${UID}.sh"
+    local cached="${TMPDIR:-/tmp}/delivery-experiment-bsc_cluster_multi-${UID}.sh"
     if [ ! -s "${cached}" ]; then
         git -C "${REPO_DIR}/node-deploy" show "main:bsc_cluster_multi.sh" >"${cached}"
         chmod 755 "${cached}"

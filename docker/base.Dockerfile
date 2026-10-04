@@ -6,9 +6,8 @@
 # Build from the repository root:
 #   docker build -t bsc-attack-base:latest -f docker/base.Dockerfile .
 #
-# Ubuntu 24.04 provides Python 3.12 and Poetry 1.8.x via apt, matching the
-# environment that runs the experiments (genesis pyproject.toml needs Poetry
-# >= 1.8 for `package-mode`).
+# Ubuntu 24.04 provides Python 3.12. Poetry is installed separately at the
+# pinned 2.1.3 version because the genesis lockfile uses the Poetry 2.1 format.
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -54,5 +53,14 @@ ENV PATH="/root/.foundry/bin:${PATH}"
 # branches; large runtime/data dirs are excluded via .dockerignore).
 WORKDIR /opt/bsc-attack
 COPY . /opt/bsc-attack
+
+# The repository distributes the deployment tree and experiment sources as
+# archives. Expand them inside the image so a Zenodo/source checkout is
+# self-contained and the flow scripts can build their selected branches.
+RUN unzip -q -o node-deploy.zip -d /opt/bsc-attack && \
+    for archive in /opt/bsc-attack/code/*.zip; do \
+      unzip -q -o "${archive}" -d /opt/bsc-attack/code || exit 1; \
+    done && \
+    rm -f /opt/bsc-attack/node-deploy.zip /opt/bsc-attack/code/*.zip
 
 WORKDIR /opt/bsc-attack/node-deploy

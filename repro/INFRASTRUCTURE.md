@@ -72,10 +72,9 @@ The repository currently contains two resource descriptions that must be disting
    with 16 vCPUs and 64 GiB RAM per instance.
 
 These are two documented resource levels for the second, geo-distributed configuration. The
-artifact does not claim that `t2.xlarge` is a validated minimum, and it does not require
-`m5.4xlarge` unless that is the resource level selected for the evaluation run. Before final
-submission, record the instance size actually validated by the authors and use it consistently in
-the paper, README, scripts, and metadata.
+reproduction guide uses `t2.xlarge` as the tested evaluator setup; `m5.4xlarge` is the larger
+instance class reported for the paper's original run. Evaluators should record which class they
+use in their run metadata; the scripts do not assume either class after provisioning.
 
 For each Delivery experiment instance, use:
 

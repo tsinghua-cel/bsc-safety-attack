@@ -106,7 +106,6 @@ The IPs above are the currently configured delivery deployment. Replace them for
 > the validator set/order, pick eligible ones (Phase 3 has a safety net that simply
 > skips a slot rather than stalling the chain if neither b1 nor b2 is eligible).
 
-
 ## 4. Run the experiment
 
 The scripts validate the local PEM files and required archives before connecting. After the
@@ -215,7 +214,7 @@ repro/cluster.sh check      # UK seal-gate lines (confirms b1/b2 sealed + in-tur
 |-----------|---------|---------|------------------|
 | 30 ms | 10 | 0 | no |
 | 60 ms | 10 | 0 | no |
-| 75 ms | 7 | 3 | starting to flip |
+| 75 ms | 8 | 2 | starting to flip |
 | 90 ms | 7 | 3 | flipping (stronger b2 margins) |
 
 **Flip threshold ≈ 75 ms**, matching the latency model

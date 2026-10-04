@@ -42,6 +42,7 @@ is documented in [`repro/REPRODUCE.md`](repro/REPRODUCE.md).
 - [Data provenance](testdata/DATA_PROVENANCE.md)
 - [Data collection ethics](testdata/DATA_ETHICS.md)
 - [Delivery experiment reproduction guide](repro/REPRODUCE.md)
+- [Local/toolchain setup](#manual-local-run)
 
 The author's public IP addresses may appear in the experiment configuration or historical logs.
 They are deployment-specific values used for the reported experiment, are not required for
@@ -96,16 +97,20 @@ Each config directory contains a `data/` folder and a `csv/` folder.
 | `repair_finalized_heights.csv` | `analyze_repair_finalized_heights.py` | `slot, benchmark_finalized_height, branch_a_finalized_height, branch_b_finalized_height` | Finalized-height series for the repair run; shows whether the branches re-converge once the partition is lifted. |
 | `repair_readme_branch_by_slot.csv` | repair analysis helper | `slot, common, A_branch, B_branch` | Branch assignment per slot (common prefix vs. branch A vs. branch B), i.e. which chain each height belongs to during the repair run. |
 
+The artifact does not include logs from an independent attack-free baseline run; the `benchmark_*` columns are computed reference series, not measurements from a separate baseline experiment.
+
 `testdata/script/` also includes `check_attack2_schedule.py` / `check_attack2_8_schedule.py`
 (verify the manual block-routing schedule) and the turn-length-8 variants of the analyzers
 (`analyze_attack_2_8_*`, `analyze_repair_8_finalized_heights.py`).
 
 ## Experiments and code layout
 
-Each `code/<name>` folder is its own git repository. The flow scripts in `node-deploy/` build a
-`geth` binary from that source, then drive the cluster. A `--epoch-interval NAME` flag makes the
-flow script `git checkout NAME` in the corresponding code repo before building; the default
-`master` branch is the `epoch_200_interval_1000` configuration.
+Each expanded `code/<name>` folder is its own git repository. In the published artifact these
+repositories are distributed as `code/<name>.zip`; expand them with the commands in
+[Manual local run](#manual-local-run) (or let the Docker base build expand them). The flow scripts
+in `node-deploy/` then build a `geth` binary from that source, and `--epoch-interval NAME` selects the
+source branch before building; the
+default `master` branch is the `epoch_200_interval_1000` configuration.
 
 - **`code/attack-1-code`** → `node-deploy/test_attack_1_flow.sh`
   - branches: `master` (= `epoch_200_interval_1000`), `epoch_1000_interval_450`,
@@ -135,6 +140,13 @@ repository. For the quickest run, use the prebuilt images below. Run one experim
 and wait for the command to finish. The command streams the
 experiment log in the terminal; success means the flow prints its final `... experiment flow finished`
 message and returns exit code `0`.
+
+### Resource requirements
+
+- 42–43 node processes per run; reserve approximately 40–50 GB of disk space for retained data.
+- Recommended host: 16 vCPU and 64 GB RAM.
+- Internet access is required during setup and execution to pull Docker images and install dependencies.
+- Runtime estimate from archived log timestamps (excluding setup and image-build time): Q1 takes about 12–32 minutes per configuration; Q2 takes about 10–24 minutes per configuration; the four Q3 configurations take about 75 minutes total (about 10–24 minutes each).
 
 ### 1. Pull the images (once)
 
@@ -210,8 +222,9 @@ For the separate Delivery experiment (Q4: Feasibility of selective delivery),See
 ## Manual build & execution
 
 `install-dev.sh` installs common environment dependencies only. It does not select an experiment
-or its parameter configuration. Use the experiment-specific commands in the `Launching experiments`
-section below; the delivery experiment uses the separate multi-host workflow under `repro/`.
+or its parameter configuration. Follow [Manual local run](#manual-local-run) below for the
+required versions, archive unpack steps, and experiment-specific commands; the delivery experiment
+uses the separate multi-host workflow under `repro/`.
 
 We also provide a fully manual setup for users who prefer to inspect and customize the testing
 environment. See the [Appendix](#appendix) for the complete dependency list and setup steps.
@@ -222,12 +235,28 @@ This path runs the experiments directly from the current repository, without Doc
 experiment commands as your normal user; use `sudo` only for installing system dependencies.
 Run one experiment at a time.
 
-### 1. Prepare `node-deploy`
+### Required versions
 
-From the repository root, unpack the deployment scripts and keys:
+Use the same toolchain versions as `docker/base.Dockerfile`:
+
+- Ubuntu 24.04 (or a compatible Linux host)
+- Docker Engine/CLI 29.1.3 (tested)
+- Python 3.12 with `venv` and `pip`
+- Poetry 2.1.3
+- Go 1.24.4 (the included BSC modules declare Go 1.24.0)
+- Node.js 18.x with npm 6.14.6
+- Foundry 1.2.1
+- Bash, Git, `jq`, `unzip`, `curl`, `wget`, and a C/C++ build toolchain
+
+### 1. Prepare deployment scripts and source code
+
+From the repository root, unpack the deployment scripts, keys, and experiment sources:
 
 ```bash
 unzip -q -o node-deploy.zip
+for archive in code/*.zip; do
+  unzip -q -o "$archive" -d code
+done
 ```
 
 ### 2. Install dependencies

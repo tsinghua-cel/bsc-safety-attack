@@ -11,10 +11,11 @@ curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     npm install -g npm@6.14.6 && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Go 1.21
-wget https://go.dev/dl/go1.21.10.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go1.21.10.linux-amd64.tar.gz && \
-    rm go1.21.10.linux-amd64.tar.gz
+# Install Go 1.24.4 (the included BSC modules declare Go 1.24.0)
+wget https://go.dev/dl/go1.24.4.linux-amd64.tar.gz && \
+    rm -rf /usr/local/go && \
+    tar -C /usr/local -xzf go1.24.4.linux-amd64.tar.gz && \
+    rm go1.24.4.linux-amd64.tar.gz
 export PATH="/usr/local/go/bin:${PATH}"
 
 # Install Foundry (pin to v1.2.1 to match CI in node-deploy/genesis/.github/workflows/unit-test.yml;

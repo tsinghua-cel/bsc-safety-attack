@@ -7,10 +7,11 @@ node-deploy/bin
 **/build/bin
 **/__pycache__
 
-# Collected results and archives (not needed to run experiments)
+# Collected results (not needed to build or run the experiments)
 testdata
-*.zip
-node-deploy.zip
+
+# Keep node-deploy.zip and code/*.zip in the Docker context. The base Dockerfile
+# expands these archives into the image before removing the archive copies.
 
 # Root repo history is not needed inside the image; the per-experiment
 # code/*/.git repos ARE kept so the flow scripts can checkout branches.
