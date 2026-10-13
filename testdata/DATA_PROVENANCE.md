@@ -71,13 +71,22 @@ All `analyze_*.py` scripts require an explicit `--split-height`.
 For attestation analysis, use `params/validators.go` from the listed branch in
 `code/attack-1-code.zip`, with `--count-field group --fill forward`.
 
-Example: regenerate epoch-1000 attestations from the repository root:
+### CSV regeneration commands
+
+Example: regenerate the epoch-1000 Q1 finalized-height CSV and attestations from the
+repository root:
 
 ```bash
 ROOT="$(pwd)"
 WORK="$(mktemp -d)"
 DATASET="epoch_1000_interval_450_turnlength_8"
 unzip -q "$ROOT/testdata/$DATASET/data/attack-1-testdata.zip" -d "$WORK/logs"
+python3 "$ROOT/testdata/script/analyze_attack_1_finalized_heights.py" \
+  --start 300 --end 1200 --split-height 998 \
+  --node-a-log "$WORK/logs/.local/node0/bsc.log" \
+  --node-b-log "$WORK/logs/.local/node10/bsc.log" \
+  --output "$WORK/attack_1_finalized_heights.csv"
+
 unzip -q "$ROOT/code/attack-1-code.zip" -d "$WORK/source"
 git -C "$WORK/source/attack-1-code" show epoch_1000_interval_450:params/validators.go \
   > "$WORK/validators.go"

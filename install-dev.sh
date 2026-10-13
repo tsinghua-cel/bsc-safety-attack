@@ -1,9 +1,20 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-# Install dependencies
+# Install dependencies. Keep Poetry in sync with docker/base.Dockerfile: the
+# genesis lockfile uses the Poetry 2.1 format, which Ubuntu's apt package
+# (1.8.x) cannot read.
+POETRY_VERSION=2.1.3
+
 apt-get update && \
-    apt-get install -y curl wget git build-essential python3 python3-venv python3-pip python3-poetry jq unzip && \
+    apt-get install -y curl wget git build-essential python3 python3-venv python3-pip gawk jq unzip && \
+    update-alternatives --set awk /usr/bin/gawk && \
     rm -rf /var/lib/apt/lists/*
+
+# Install the same pinned Poetry release used by the Docker image.
+curl -sSL https://install.python-poetry.org | python3 - --version "${POETRY_VERSION}"
+ln -sf /root/.local/bin/poetry /usr/local/bin/poetry
+export PATH="/root/.local/bin:${PATH}"
 
 # Install Node.js 18.20.2 and npm 6.14.6
 curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \

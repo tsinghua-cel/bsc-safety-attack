@@ -151,7 +151,7 @@ ATTACK_COUNT=100      repro/03_experiment.sh   # 100 samples per lead (~2h each)
 | script | phase | action |
 |--------|-------|--------|
 | `config.sh` | — | single source of truth (IPs, PEMs, node split, attack knobs) |
-| `remote_bootstrap.sh` | 1 | runs **on each server**: installs Go/Foundry/Node/Python/jq, symlinks to `/usr/local/bin` |
+| `remote_bootstrap.sh` | 1 | runs **on each server**: installs Go/Foundry/Node/Python/GNU awk/jq and Poetry 2.1.3; symlinks Go/Foundry to `/usr/local/bin` |
 | `01_provision.sh` | 1 | SSH login check → bootstrap → create remote workspace → upload local archives → unzip `node-deploy.zip` + `code/delivery-experiment.zip` → build `create-validator` (3 hosts in parallel) |
 | `02_genesis.sh` | 2 | build `geth` on the UK host → `bsc_cluster_multi.sh gen` (keys, genesis, 21 configs, **rewrite `127.0.0.1` enode → public IPs**) → tar & distribute node0-6→SG, node7-13→US, `genesis.json`→all |
 | `03_experiment.sh` | 3 | drives `sweep_leads.sh` over `LEADS`, then `04_summarize.sh` |

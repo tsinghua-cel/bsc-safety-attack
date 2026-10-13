@@ -142,9 +142,9 @@ US-routed sibling `b2` around 75–90 ms.
 
 Phase 1 installs the software needed by the remote workflow, including:
 
-- Bash and standard Ubuntu build tools;
+- Bash, GNU awk, and standard Ubuntu build tools;
 - Git, curl, wget, unzip, and jq;
-- Python 3, virtual-environment support, pip, and Poetry;
+- Python 3, virtual-environment support, pip, and Poetry 2.1.3;
 - Node.js 18 and npm 6.14.6;
 - Foundry v1.2.1;
 - Go, with the version matching the BSC source and Docker build environment.
