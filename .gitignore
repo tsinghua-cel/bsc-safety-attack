@@ -25,4 +25,5 @@
 /pem
 /attack_logs
 /attack_logs.b
+/results/
 .DS_Store

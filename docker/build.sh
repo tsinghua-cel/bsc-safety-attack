@@ -33,9 +33,9 @@ build_experiment() {
     local name=$1
     local tag=$2
     echo ">> building ${tag} (${name})"
-    # Experiment Dockerfiles only do FROM/WORKDIR/ENTRYPOINT, so the small
-    # docker/ dir is enough as build context.
-    docker build -t "${tag}" -f "${docker_dir}/${name}.Dockerfile" "${docker_dir}"
+    # Add the shared result/analyzer entrypoint and Python analyzers from the
+    # repository while reusing the already-built base image.
+    docker build -t "${tag}" -f "${docker_dir}/${name}.Dockerfile" "${repo_root}"
 }
 
 target="${1:-all}"

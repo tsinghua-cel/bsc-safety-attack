@@ -1,12 +1,16 @@
 # Repair experiment for attack 2 (lifts the partition after the fork window).
 #
-# Build (requires bsc-attack-base:latest first):
-#   docker build -t bsc-repair -f docker/repair.Dockerfile docker
+# Build from the repository root (includes flow wrapper and analyzers):
+#   ./docker/build.sh repair
 #
-# Run:
-#   docker run --rm bsc-repair
-#   docker run --rm -e EPOCH_INTERVAL=epoch_200_interval_3000 bsc-repair
+# Run with a host results directory:
+#   docker run --rm -v "$PWD/results/repair:/results" bsc-repair
 FROM bsc-attack-base:latest
 
+COPY docker/run-experiment.sh /opt/bsc-attack/docker/run-experiment.sh
+COPY testdata/script/ /opt/bsc-attack/testdata/script/
+RUN chmod +x /opt/bsc-attack/docker/run-experiment.sh
+
+ENV EXPERIMENT_KIND=repair
 WORKDIR /opt/bsc-attack/node-deploy
-ENTRYPOINT ["./repair.sh"]
+ENTRYPOINT ["/opt/bsc-attack/docker/run-experiment.sh"]

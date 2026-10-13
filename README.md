@@ -39,7 +39,7 @@ is documented in [`repro/REPRODUCE.md`](repro/REPRODUCE.md).
 ## Artifact evaluation documents
 
 - [Infrastructure requirements](repro/INFRASTRUCTURE.md)
-- [Data provenance](testdata/DATA_PROVENANCE.md)
+- [Data provenance and CSV regeneration instructions](testdata/DATA_PROVENANCE.md#csv-regeneration-commands)
 - [Data collection ethics](testdata/DATA_ETHICS.md)
 - [Delivery experiment reproduction guide](repro/REPRODUCE.md)
 - [Local/toolchain setup](#manual-local-run)
@@ -135,11 +135,8 @@ default `master` branch is the `epoch_200_interval_1000` configuration.
 experiments.** It provides the tested toolchain and an isolated 21-validator environment, so
 users do not need to install Go, Node.js, Foundry, Poetry, or Python dependencies manually.
 
-You can either use the prebuilt Docker Hub images or build equivalent images from the local
-repository. For the quickest run, use the prebuilt images below. Run one experiment at a time
-and wait for the command to finish. The command streams the
-experiment log in the terminal; success means the flow prints its final `... experiment flow finished`
-message and returns exit code `0`.
+Use the prebuilt Docker Hub images. Run one experiment at a time and mount a host results directory
+into the container so its logs and analysis outputs remain available after Docker removes it.
 
 ### Resource requirements
 
@@ -176,46 +173,63 @@ current repository. This does not change the run commands; it only creates local
 ```
 
 The local image tags are `bsc-attack-1`, `bsc-attack-2`, `bsc-attack-2-turnlen-8`,
-`bsc-repair`, and `bsc-repair-8`. Replace the Docker Hub image name in the run commands with
-the corresponding local tag.
+`bsc-repair`, and `bsc-repair-8`. Replace the Docker Hub image name in a run command with its
+corresponding local tag when using a locally built image.
 
 ### 2. Run an experiment
 
-Run one experiment at a time and wait for the command to finish.
+Run one experiment at a time. Create separate host directories for the results; each command
+runs the experiment, archives its validator logs, and runs the matching analysis scripts inside
+the container.
 
 ```bash
+mkdir -p results/q1 results/q2 results/q3-200-3000-t1 results/q3-200-1000-t1 results/q3-200-1000-t8
+
 # Q1: Violation of safety for the warm-up attack
-docker run --rm erick785/bsc-new-attack-1 \
-  --epoch-interval epoch_1000_interval_450 --turnlength8
+docker run --rm \
+  -v "$PWD/results/q1:/results" \
+  erick785/bsc-new-attack-1 --epoch-interval epoch_1000_interval_450 --turnlength8
 
 # Q2: Violation of safety for the committee divergence attack
-docker run --rm erick785/bsc-new-attack-2-turnlen-8 \
-  --epoch-interval epoch_1000_interval_450
+docker run --rm \
+  -v "$PWD/results/q2:/results" \
+  erick785/bsc-new-attack-2-turnlen-8 --epoch-interval epoch_1000_interval_450
 
 # Q3: Impact of protocol parameters
 
 # Parameter variation: S=200, 3s, turnLength=1
-docker run --rm erick785/bsc-new-attack-2 \
-  --epoch-interval epoch_200_interval_3000
+docker run --rm \
+  -v "$PWD/results/q3-200-3000-t1:/results" \
+  erick785/bsc-new-attack-2 --epoch-interval epoch_200_interval_3000
 
 # Parameter variation: S=200, 1s, turnLength=1
-docker run --rm erick785/bsc-new-attack-2
+docker run --rm \
+  -v "$PWD/results/q3-200-1000-t1:/results" \
+  erick785/bsc-new-attack-2
 
 # Parameter variation: S=200, 1s, turnLength=8
-docker run --rm erick785/bsc-new-attack-2-turnlen-8
+docker run --rm \
+  -v "$PWD/results/q3-200-1000-t8:/results" \
+  erick785/bsc-new-attack-2-turnlen-8
 ```
 
-Do not press `Ctrl-C` while a run is active. These experiments start a local 21-validator
-network and may take several minutes. 
+Each results directory receives `flow.log`, `analysis.log`, `node-logs.tar.gz`, and
+`validators.go`, plus the CSV files generated for that experiment. Attack 1 produces
+`attack_1_finalized_heights.csv` and `matching_attestations.csv`; Attack 2 produces
+`attack_2_finalized_heights.csv` and `attack_2_total_difficulty.csv`; repair runs produce
+`repair_finalized_heights.csv`. The archive contains BSC logs only, not the larger chain
+databases. Python does not need to be installed on the host.
 
-The success sign is a final log line containing:
+At the end of a successful run, the flow prints a line like
+`[YYYY-MM-DD HH:MM:SS] attack-2 experiment flow finished`. After analysis completes, the
+container prints:
 
 ```text
-[YYYY-MM-DD HH:MM:SS] ... experiment flow finished
+Experiment and analysis completed. Results: /results
 ```
 
-The `--rm` option removes the finished container after the run. The flow scripts perform the
-build, initialization, cluster startup, checks, and cleanup inside the container.
+The container returns exit code `0` after both the experiment and analysis finish. If the flow
+fails, it still saves the flow output and any node logs produced before failure.
 
 For the separate Delivery experiment (Q4: Feasibility of selective delivery),See [`repro/REPRODUCE.md`](repro/REPRODUCE.md) for the full guide. it requires three evaluator-controlled hosts and SSH credentials.
 
@@ -246,7 +260,7 @@ Use the same toolchain versions as `docker/base.Dockerfile`:
 - Go 1.24.4 (the included BSC modules declare Go 1.24.0)
 - Node.js 18.x with npm 6.14.6
 - Foundry 1.2.1
-- Bash, Git, `jq`, `unzip`, `curl`, `wget`, and a C/C++ build toolchain
+- Bash, Git, GNU awk (`gawk`, selected as `awk`), `jq`, `unzip`, `curl`, `wget`, and a C/C++ build toolchain
 
 ### 1. Prepare deployment scripts and source code
 

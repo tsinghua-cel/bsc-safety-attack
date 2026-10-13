@@ -7,8 +7,12 @@ node-deploy/bin
 **/build/bin
 **/__pycache__
 
-# Collected results (not needed to build or run the experiments)
-testdata
+# Collected results (not needed to build or run the experiments). Keep only
+# the Python analyzers, which are copied into experiment images for auto-analysis.
+testdata/*
+!testdata/script/
+testdata/script/*
+!testdata/script/*.py
 
 # Keep node-deploy.zip and code/*.zip in the Docker context. The base Dockerfile
 # expands these archives into the image before removing the archive copies.
