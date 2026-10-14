@@ -296,6 +296,10 @@ no separate Python virtual-environment command is required.
 
 ### 3. Run one experiment
 
+Before the attack begins, the additional validators on branches A and B must be registered and
+active. The flow submits the validator-registration transactions on both branches at its
+registration checkpoint, then proceeds with the attack.
+
 ```bash
 cd node-deploy
 
